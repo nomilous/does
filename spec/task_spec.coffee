@@ -18,3 +18,13 @@ require('nez').realize 'Task', (Task, test, context, should) ->
             task.start().running.should.equal true
             test done
 
+
+
+    context 'does()', (it) -> 
+
+        it 'registers actionFn as task middleware', (done) -> 
+            task = Task.create 'make task middleware registrar'
+            task.does 'step1', -> test done
+            task.start()
+
+

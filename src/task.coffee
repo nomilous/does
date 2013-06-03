@@ -10,7 +10,8 @@ module.exports =
 
     create: (title) -> 
 
-        return task = 
+        middleware = []
+        task = 
 
             title: title
             running: false
@@ -21,6 +22,23 @@ module.exports =
             # * starts the task
             #
 
-            start: fluent -> task.running = true
+            start: fluent -> 
 
+                task.running = true
+                fn() for fn in middleware
 
+            #
+            # task.does( actionTitle, actionFn )
+            # 
+            # * registers actionFn as task middleware
+            # 
+
+            does: (actionTitle, actionFn) ->
+
+                middleware.push actionFn
+
+                #
+                # use actionTitle later
+                #
+
+        return task
