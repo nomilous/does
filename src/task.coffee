@@ -23,7 +23,7 @@ module.exports =
             # * registers actionFn as task middleware
             # 
 
-            does: uniq( actions, (actionTitle, actionFn) ->
+            does: fluent uniq( actions, (actionTitle, actionFn) ->
 
                 middleware.push actionFn
 
