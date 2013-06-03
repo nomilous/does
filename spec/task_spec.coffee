@@ -10,10 +10,30 @@ require('nez').realize 'Task', (Task, test, context, should) ->
             should.exist task
             test done
 
-        it 'ensures unique title', (done) -> throw Error
-        it 'protects title (readonly property)', (done) -> throw Error
-        it 'protects running (readonly property)', (done) -> throw Error
+        it 'ensures unique title', (done) -> 
 
+            task1 = Task.create 'duplicate name'
+            try task2 = Task.create 'duplicate name'
+            catch error
+                error.should.match /cannot recreate task/
+                test done
+
+        it 'protects title (readonly property)', (done) -> 
+
+            task = Task.create 'readonly title'
+            task.title = 'rename it'
+            task.title.should.equal 'readonly title'
+            test done
+
+        it 'protects running (readonly property)', (done) -> 
+
+            task = Task.create 'immutable'
+            task.running.should.equal false
+            task.running = true
+            task.running.should.equal false
+            task.start()
+            task.running.should.equal true
+            test done
 
 
     context 'does()', (it) -> 
@@ -34,7 +54,7 @@ require('nez').realize 'Task', (Task, test, context, should) ->
             test done
 
         it 'accepts input that is passed into the middleware', (done) -> 
-        
+
             task = Task.create 'make task accept input'
             task.does 'thing', (input) -> 
                 input.should.eql initial: 'VALUE'

@@ -1,4 +1,5 @@
 fluent = require('./decorators').fluent
+tasks  = {}
 
 module.exports =
 
@@ -10,11 +11,15 @@ module.exports =
 
     create: (title) -> 
 
-        middleware = []
+        if tasks[title]?
+            throw new Error "cannot recreate task '#{title}'"
+
+        tasks[title] = 1
+        running      = false
+        middleware   = []
         task = 
 
-            title: title
-            running: false
+            
 
             #
             # task.does( actionTitle, actionFn )
@@ -39,8 +44,18 @@ module.exports =
 
             start: fluent (input) -> 
 
-                task.running = true
+                running = true
                 fn(input) for fn in middleware
 
+
+        Object.defineProperty task, 'title', 
+            get: -> title
+            readonly: true
+            enumerable: true
+
+        Object.defineProperty task, 'running', 
+            get: -> running
+            readonly: true
+            enumerable: true
 
         return task
