@@ -41,11 +41,11 @@ module.exports =
     # ...see how it goes
     # 
 
-    uniq: (index, fn) -> -> 
+    uniq: (index, fn) -> (value) -> 
 
-        if index[arguments[0]]? 
-            throw new Error "received duplicate #{argsOf(fn)[0]}"
+        if index[value]? 
+            throw new Error "received duplicate #{argsOf(fn)[0]} as '#{value}'"
 
-        index[arguments[0]] = {}
+        index[value] = {}
         fn.apply this, arguments
 

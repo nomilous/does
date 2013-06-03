@@ -31,7 +31,7 @@ require('nez').realize 'Decorators', (Decorators, test, context) ->
             fn 'value2'
             try fn 'value1'
             catch error
-                error.should.match /received duplicate firstArgument/
+                error.should.match /received duplicate firstArgument as 'value1'/
                 test done
 
 
