@@ -1,0 +1,18 @@
+{
+  "name": "does",
+  "description": "pending - action pipeline",
+  "version": "0.0.0",
+  "author": "nomilous <nomilous@gmail.com>",
+  "contributors": [
+    {
+      "name": "nomilous",
+      "email": "nomilous@gmail.com"
+    }
+  ],
+  "repository": "git@github.com:nomilous/does.git",
+  "dependencies": {},
+  "devDependencies": {
+    "nez": "0.0.7",
+    "should": "~1.2.2"
+  }
+}

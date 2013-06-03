@@ -1,0 +1,13 @@
+#!/usr/bin/env coffee
+
+require('nez').objective 'does',
+
+    description: """
+
+        * named promise    - Becomes Task
+        * named middleware - Becomes component sequence 
+                             of Actions
+
+                             (to realize/resolve Task)
+
+    """, (requirement) -> 
