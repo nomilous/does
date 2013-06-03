@@ -17,17 +17,6 @@ module.exports =
             running: false
 
             #
-            # task.start() 
-            # 
-            # * starts the task
-            #
-
-            start: fluent -> 
-
-                task.running = true
-                fn() for fn in middleware
-
-            #
             # task.does( actionTitle, actionFn )
             # 
             # * registers actionFn as task middleware
@@ -40,5 +29,18 @@ module.exports =
                 #
                 # use actionTitle later
                 #
+
+
+            #
+            # task.start() 
+            # 
+            # * starts the task
+            #
+
+            start: fluent (input) -> 
+
+                task.running = true
+                fn(input) for fn in middleware
+
 
         return task
