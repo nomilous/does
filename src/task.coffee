@@ -1,4 +1,5 @@
 fluent = require('./decorators').fluent
+uniq   = require('./decorators').uniq
 tasks  = {}
 
 module.exports =
@@ -9,17 +10,12 @@ module.exports =
     # * creates and returns a task with the given title (name)
     # 
 
-    create: (title) -> 
+    create: uniq( tasks, (taskTitle) -> 
 
-        if tasks[title]?
-            throw new Error "cannot recreate task '#{title}'"
-
-        tasks[title] = 1
         running      = false
+        actions      = {}
         middleware   = []
         task = 
-
-            
 
             #
             # task.does( actionTitle, actionFn )
@@ -27,7 +23,7 @@ module.exports =
             # * registers actionFn as task middleware
             # 
 
-            does: (actionTitle, actionFn) ->
+            does: uniq( actions, (actionTitle, actionFn) ->
 
                 middleware.push actionFn
 
@@ -35,6 +31,7 @@ module.exports =
                 # use actionTitle later
                 #
 
+            )
 
             #
             # task.start() 
@@ -49,7 +46,7 @@ module.exports =
 
 
         Object.defineProperty task, 'title', 
-            get: -> title
+            get: -> taskTitle
             readonly: true
             enumerable: true
 
@@ -59,3 +56,5 @@ module.exports =
             enumerable: true
 
         return task
+
+    )

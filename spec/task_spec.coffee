@@ -10,12 +10,12 @@ require('nez').realize 'Task', (Task, test, context, should) ->
             should.exist task
             test done
 
-        it 'ensures unique title', (done) -> 
+        it 'ensures unique task title', (done) -> 
 
             task1 = Task.create 'duplicate name'
             try task2 = Task.create 'duplicate name'
             catch error
-                error.should.match /cannot recreate task/
+                error.should.match /received duplicate taskTitle/
                 test done
 
         it 'protects title (readonly property)', (done) -> 
@@ -43,6 +43,17 @@ require('nez').realize 'Task', (Task, test, context, should) ->
             task = Task.create 'make task middleware registrar'
             task.does 'step1', -> test done
             task.start()
+
+        it 'ensures unique action title', (done) -> 
+
+            task = Task.create 'make action title unique'
+            task.does 'action1', -> 
+            task.does 'action2', -> 
+            try task.does 'action1', ->
+
+            catch error
+                error.should.match /received duplicate actionTitle/
+                test done
 
 
     context 'start()', (it) -> 
