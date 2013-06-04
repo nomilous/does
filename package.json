@@ -10,7 +10,9 @@
     }
   ],
   "repository": "git@github.com:nomilous/does.git",
-  "dependencies": {},
+  "dependencies": {
+    "when": "~2.1.0"
+  },
   "devDependencies": {
     "nez": "0.0.7",
     "should": "~1.2.2"

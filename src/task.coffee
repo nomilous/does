@@ -1,5 +1,6 @@
 fluent = require('./decorators').fluent
 uniq   = require('./decorators').uniq
+defer  = require('./decorators').defer
 tasks  = {}
 
 module.exports =
@@ -25,7 +26,12 @@ module.exports =
 
             does: fluent uniq( actions, (actionTitle, actionFn) ->
 
-                middleware.push actionFn
+                #
+                # convert actionFn to middleware
+                #
+
+                middleware.push defer actionFn
+
 
                 #
                 # use actionTitle later

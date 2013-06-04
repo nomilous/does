@@ -48,16 +48,16 @@ require('nez').realize 'Task', (Task, test, context, should) ->
 
             v = n: 0
             Task.create( 'count to ten' )
-            .does( '1',  (input) -> input.n++ )
-            .does( '2',  (input) -> input.n++ )
-            .does( '3',  (input) -> input.n++ )
-            .does( '4',  (input) -> input.n++ )
-            .does( '5',  (input) -> input.n++ )
-            .does( '6',  (input) -> input.n++ )
-            .does( '7',  (input) -> input.n++ )
-            .does( '8',  (input) -> input.n++ )
-            .does( '9',  (input) -> input.n++ )
-            .does( '10', (input) -> input.n++ )
+            .does( '1',  (t, input) -> input.n++ )
+            .does( '2',  (t, input) -> input.n++ )
+            .does( '3',  (t, input) -> input.n++ )
+            .does( '4',  (t, input) -> input.n++ )
+            .does( '5',  (t, input) -> input.n++ )
+            .does( '6',  (t, input) -> input.n++ )
+            .does( '7',  (t, input) -> input.n++ )
+            .does( '8',  (t, input) -> input.n++ )
+            .does( '9',  (t, input) -> input.n++ )
+            .does( '10', (t, input) -> input.n++ )
             .start v
             v.should.eql n: 10
             test done
@@ -87,7 +87,7 @@ require('nez').realize 'Task', (Task, test, context, should) ->
         it 'accepts input that is passed into the middleware', (done) -> 
 
             task = Task.create 'make task accept input'
-            task.does 'thing', (input) -> 
+            task.does 'thing', (t, input) -> 
                 input.should.eql initial: 'VALUE'
                 test done
 

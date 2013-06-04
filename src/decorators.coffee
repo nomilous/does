@@ -1,3 +1,5 @@
+Defer  = require('when').defer
+
 argsOf = (fn) ->
 
     #
@@ -48,4 +50,19 @@ module.exports =
 
         index[value] = {}
         fn.apply this, arguments
+
+    #
+    # defer(fn)
+    # 
+    # - decorated function is wraped into a deferral
+    # - deferral is passed to the function as first arg
+    # - the promise is returned
+    #
+
+    defer: (fn) -> 
+        args = [Defer()]
+        -> 
+            args.push arg for arg in arguments
+            fn.apply this, args
+            args[0].promise
 
