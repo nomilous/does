@@ -60,8 +60,8 @@ module.exports =
     #
 
     deferred: (fn) -> 
-        args = [Defer()]
-        -> 
+        ->  
+            args = [Defer()]
             args.push arg for arg in arguments
             fn.apply this, args
             args[0].promise
