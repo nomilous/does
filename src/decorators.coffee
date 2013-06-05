@@ -52,14 +52,14 @@ module.exports =
         fn.apply this, arguments
 
     #
-    # defer(fn)
+    # deferred(fn)
     # 
     # - decorated function is wraped into a deferral
     # - deferral is passed to the function as first arg
     # - the promise is returned
     #
 
-    defer: (fn) -> 
+    deferred: (fn) -> 
         args = [Defer()]
         -> 
             args.push arg for arg in arguments

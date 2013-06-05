@@ -1,7 +1,8 @@
-fluent = require('./decorators').fluent
-uniq   = require('./decorators').uniq
-defer  = require('./decorators').defer
-tasks  = {}
+fluent   = require('./decorators').fluent
+uniq     = require('./decorators').uniq
+deferred = require('./decorators').deferred
+pipeline = require('when/pipeline')#.pipeline
+tasks    = {}
 
 module.exports =
 
@@ -30,7 +31,7 @@ module.exports =
                 # convert actionFn to middleware
                 #
 
-                middleware.push defer actionFn
+                middleware.push deferred actionFn
 
 
                 #
@@ -45,10 +46,29 @@ module.exports =
             # * starts the task
             #
 
-            start: fluent (input) -> 
+            start: (input) -> 
 
-                running = true
-                fn(input) for fn in middleware
+                finished = [ deferred (deferral, result) ->
+
+                    #
+                    # called at the end of the pipeline (task done)
+                    #
+
+                    running = false
+                    deferral.resolve result
+
+                ]
+
+                running   = true
+                functions = []
+                pipeline( 
+
+                    for fn in middleware.concat finished
+
+                        functions.push fn
+                        -> functions.shift()( input )
+
+                )
 
 
         Object.defineProperty task, 'title', 

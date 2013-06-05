@@ -37,11 +37,11 @@ require('nez').realize 'Decorators', (Decorators, test, context) ->
 
     context 'defer', (it) -> 
 
-        defer = Decorators.defer
+        deferred = Decorators.deferred
 
         it 'wraps a function into a deferral and returns the promise', (done) -> 
 
-            fn = defer (defer, input) -> defer.resolve ++input
+            fn = deferred (deferral, input) -> deferral.resolve ++input
             fn( 1 ).then (result) -> 
                 result.should.equal 2
                 test done

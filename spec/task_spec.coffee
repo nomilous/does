@@ -46,21 +46,21 @@ require('nez').realize 'Task', (Task, test, context, should) ->
 
         it 'allows method chaining', (done) -> 
 
-            v = n: 0
+
             Task.create( 'count to ten' )
-            .does( '1',  (t, input) -> input.n++ )
-            .does( '2',  (t, input) -> input.n++ )
-            .does( '3',  (t, input) -> input.n++ )
-            .does( '4',  (t, input) -> input.n++ )
-            .does( '5',  (t, input) -> input.n++ )
-            .does( '6',  (t, input) -> input.n++ )
-            .does( '7',  (t, input) -> input.n++ )
-            .does( '8',  (t, input) -> input.n++ )
-            .does( '9',  (t, input) -> input.n++ )
-            .does( '10', (t, input) -> input.n++ )
-            .start v
-            v.should.eql n: 10
-            test done
+            .does( '1',  (t, input) -> input.n++; t.resolve() )
+            .does( '2',  (t, input) -> input.n++; t.resolve() )
+            .does( '3',  (t, input) -> input.n++; t.resolve() )
+            .does( '4',  (t, input) -> input.n++; t.resolve() )
+            .does( '5',  (t, input) -> input.n++; t.resolve() )
+            .does( '6',  (t, input) -> input.n++; t.resolve() )
+            .does( '7',  (t, input) -> input.n++; t.resolve() )
+            .does( '8',  (t, input) -> input.n++; t.resolve() )
+            .does( '9',  (t, input) -> input.n++; t.resolve() )
+            .does( '10', (t, input) -> input.n++; t.resolve() )
+            .start( n: 0 ).then (result) -> 
+                result.should.eql n: 10
+                test done
 
             
 
@@ -81,7 +81,8 @@ require('nez').realize 'Task', (Task, test, context, should) ->
         it 'starts a task', (done) -> 
 
             task = Task.create 'make task startable'
-            task.start().running.should.equal true
+            task.start()
+            task.running.should.equal true
             test done
 
         it 'accepts input that is passed into the middleware', (done) -> 
@@ -92,6 +93,31 @@ require('nez').realize 'Task', (Task, test, context, should) ->
                 test done
 
             task.start initial: 'VALUE'
+
+
+    context 'deferred', (it) -> 
+
+        it 'calls middleware with deferral', (done) -> 
+
+            task = Task.create 'use middleware'
+
+            task.does 'step1', (defer, input) -> 
+                input.one = 1
+                defer.resolve()
+
+            task.does 'step2', (defer, input) -> 
+                input.two = 2
+                defer.resolve()
+
+            task.start( {  zero: 0  } ).then (result) -> 
+
+                result.should.eql
+
+                    zero: 0
+                    one: 1
+                    two: 2
+                
+                test done
 
 
 
