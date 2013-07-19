@@ -11,7 +11,8 @@
   ],
   "repository": "git@github.com:nomilous/does.git",
   "dependencies": {
-    "when": "~2.1.0"
+    "when": "~2.1.0",
+    "node-uuid": "~1.4.0"
   },
   "devDependencies": {
     "nez": "0.0.7",
