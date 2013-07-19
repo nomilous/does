@@ -4,10 +4,6 @@ require('nez').objective 'does',
 
     description: """
 
-        * named promise    - Becomes Task
-        * named middleware - Becomes component sequence 
-                             of Actions
-
-                             (to realize/resolve Task)
+        tasks as named promises
 
     """, (requirement) -> 
