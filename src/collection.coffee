@@ -5,6 +5,12 @@
 tasks = {}
 Task  = require './task'
 
-module.exports.task = (uuid, callback) -> 
+module.exports.task = (opts, callback) -> 
 
-    callback tasks[uuid] || tasks[uuid] = new Task uuid: uuid
+    if opts.uuid? and tasks[opts.uuid]?
+
+        return callback null, tasks[opts.uuid]
+
+    task = new Task opts 
+    tasks[task.uuid] = task
+    callback null, task

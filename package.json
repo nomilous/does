@@ -1,7 +1,7 @@
 {
   "name": "does",
   "description": "pending",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "author": "nomilous <nomilous@gmail.com>",
   "contributors": [
     {
@@ -9,6 +9,7 @@
       "email": "nomilous@gmail.com"
     }
   ],
+  "main": "./lib/does",
   "repository": "git@github.com:nomilous/does.git",
   "dependencies": {
     "when": "~2.1.0",
