@@ -2,12 +2,24 @@ require('nez').realize 'Task', (Task, test, context, should) ->
 
     context 'constructor', (it) ->
 
-        it 'assigns an ID', (done) ->
+        it 'assigns a readonly ID', (done) ->
 
             task = new Task
-            task.id = 'moo'
-            should.exist task.id
+            should.exist task.uuid
+
+            #
+            # uuid is read only
+            #
+            task.uuid = 'moo'
+            task.uuid.should.not.equal 'moo'
             test done
+
+        it 'uses provided uuid', (done) -> 
+
+            task = new Task uuid: 'moo'
+            task.uuid.should.equal 'moo'
+            test done
+
 
     context 'start()', (it) -> 
 

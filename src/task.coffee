@@ -5,13 +5,13 @@ module.exports = class Task
     
     constructor: (opts = {}) -> 
 
-        @id       = opts.id || uuid.v1()
+        @uuid       = opts.uuid || uuid.v1()
         @deferral = undefined
 
-        Object.defineProperty this, 'id', 
+        Object.defineProperty this, 'uuid', 
             writable: false
             enumerable: true
-            value: @id
+            value: @uuid
 
         Object.defineProperty this, 'deferral', 
             enumerable: false
