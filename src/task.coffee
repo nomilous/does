@@ -20,7 +20,9 @@ module.exports = class Task
             enumerable: true
             get: => @deferral?
 
-    start: -> 
+    start: (opts = {}) -> 
+
+        console.log START_TASK: opts
 
         return @deferral.promise if @running
         @deferral = defer()
