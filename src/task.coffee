@@ -24,26 +24,22 @@ module.exports = class Task
             enumerable: true
             get: => @deferral?
 
-        #
-        # configure messenger middleware
-        # ------------------------------
-        # 
-        # * if [notice messenger](https://github.com/nomilous/notice) was passed then
-        #   configure for remote task realization
-        #
-
-        if @notice? then @notice.use (msg, next) -> 
-
-            #
-            # monitor message pipeline for task lifecycle events
-            # 
-
-            return next() unless msg.context.direction == 'in'
-            return next() unless msg.context.type == 'event'
-
-
-            console.log INBOUND_EVENT: msg.content
-            next()
+        # #
+        # # configure messenger middleware
+        # # ------------------------------
+        # # 
+        # # * if [notice messenger](https://github.com/nomilous/notice) was passed then
+        # #   configure for remote task realization
+        # #
+        # if @notice? then @notice.use (msg, next) -> 
+        #     console.log MSG: msg.content
+        #     #
+        #     # monitor message pipeline for task lifecycle events
+        #     # 
+        #     return next() unless msg.context.direction == 'in'
+        #     return next() unless msg.context.type == 'event'
+        #     console.log INBOUND_EVENT: msg.content
+        #     next()
 
     start: (opts = {}) -> 
 
@@ -71,3 +67,29 @@ module.exports = class Task
         @deferral = defer()
         if @notice? then @notice.event 'task::start', opts
         @deferral.promise
+
+
+    message: (msg, next) -> 
+
+        #
+        # monitor message pipeline for task lifecycle events
+        # 
+        return next() unless msg.context.direction == 'in'
+        return next() unless msg.context.type == 'event'
+        return next() unless try state = msg.context.title.match( /task::(.*)/ )[1]
+
+        switch state
+
+            when 'done' 
+
+                @deferral.resolve 'task done'
+                @deferral = undefined
+                next()
+
+            else
+
+                console.log 
+                    STATE: state
+                    MSG: msg.content
+
+                next()
