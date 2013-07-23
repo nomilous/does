@@ -99,8 +99,11 @@ module.exports = class Task
 
             else
 
-                console.log 
-                    STATE: state
-                    MSG: msg.content
+                @deferral.notify msg.update
+
+
+                # console.log 
+                #     STATE: state
+                #     MSG: msg.content
 
                 next()
