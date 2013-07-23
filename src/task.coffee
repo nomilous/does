@@ -41,6 +41,11 @@ module.exports = class Task
         #     console.log INBOUND_EVENT: msg.content
         #     next()
 
+    reload: (opts = {}) -> 
+
+        @notice   = opts.notice
+        return this
+
     start: (opts = {}) -> 
 
         if @running
@@ -53,7 +58,7 @@ module.exports = class Task
             # * possibly notify??
             # 
 
-            console.log STILL_RUNNING_PREVIOUS: opts
+            console.log STILL_RUNNING_TASK: opts
 
             return @deferral.promise
 
@@ -67,6 +72,12 @@ module.exports = class Task
         @deferral = defer()
         if @notice? then @notice.event 'task::start', opts
         @deferral.promise
+
+    terminate: -> 
+
+        #if @notice? then @notice.event 'task::terminate'
+        @deferral.reject 'task terminated' if @deferral?
+        @deferral = undefined
 
 
     message: (msg, next) -> 
