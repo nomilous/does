@@ -24,6 +24,9 @@ module.exports = class Task
             enumerable: true
             get: => @deferral?
 
+        #
+        # fix msg.reply.use()
+        #
         # #
         # # configure messenger middleware
         # # ------------------------------
@@ -85,22 +88,31 @@ module.exports = class Task
         #
         # monitor message pipeline for task lifecycle events
         # 
+
         return next() unless msg.context.direction == 'in'
-        return next() unless msg.context.type == 'event'
+        #return next() unless msg.context.type == 'event'
         return next() unless try state = msg.context.title.match( /task::(.*)/ )[1]
 
         switch state
 
-            when 'done' 
+            when 'resolve' 
 
-                @deferral.resolve 'task done'
+                @deferral.resolve msg
                 @deferral = undefined
                 next()
 
+            when 'reject'
+
+                @deferral.reject msg
+                @deferral = undefined
+                next()
+
+            when 'notify'
+
+                @deferral.notify msg
+                next()
+
             else
-
-                @deferral.notify msg.update
-
 
                 # console.log 
                 #     STATE: state
