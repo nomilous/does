@@ -1,1 +1,1 @@
-exports.tasks = require './collection'
+module.exports = ->

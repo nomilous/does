@@ -1,6 +1,2 @@
 does
 ====
-
-### experimental
-
-action pipeline

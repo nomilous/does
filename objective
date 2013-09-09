@@ -1,9 +1,0 @@
-#!/usr/bin/env coffee
-
-require('nez').objective 'does',
-
-    description: """
-
-        tasks as named promises
-
-    """, (requirement) -> 

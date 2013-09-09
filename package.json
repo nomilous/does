@@ -1,7 +1,7 @@
 {
   "name": "does",
   "description": "pending",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "nomilous <nomilous@gmail.com>",
   "contributors": [
     {
@@ -11,12 +11,6 @@
   ],
   "main": "./lib/does",
   "repository": "git@github.com:nomilous/does.git",
-  "dependencies": {
-    "when": "~2.1.0",
-    "node-uuid": "~1.4.0"
-  },
-  "devDependencies": {
-    "nez": "0.0.7",
-    "should": "~1.2.2"
-  }
+  "dependencies": {},
+  "devDependencies": {}
 }
