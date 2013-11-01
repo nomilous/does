@@ -42,6 +42,10 @@ module.exports  = (config = {}) ->
 
             id = ++seq
 
+            local.expectations[id] = 
+
+                object: object
+
             object.does = (expectations) ->
 
                 for e of expectations

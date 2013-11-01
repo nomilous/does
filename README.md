@@ -3,7 +3,7 @@
 
 
 
-For spectatability.
+For spectateability.
 
 
 does

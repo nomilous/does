@@ -1,5 +1,5 @@
 does = require '../lib/does'
-
+ipso = require 'ipso'
 
 describe 'does', -> 
 
@@ -26,7 +26,7 @@ describe 'does', ->
 
     context 'spectate()', -> 
 
-        it 'creates object.does fuction', (done) -> 
+        it 'creates object.does fuction', ipso (done) -> 
 
             thing = new class Thing
 
@@ -35,10 +35,16 @@ describe 'does', ->
                 thing.does.should.be.an.instanceof Function
                 done()
 
-                                #
-            .then (->), done    # promise rejects into done 
-                                # (to catch failing tests)
-                                #
+
+        it 'stores the object in expectations', ipso (done) -> 
+
+            thing = new class Thing
+
+            does().spectate( thing ).then (thing) -> 
+
+                does._test().expectations[1].object.should.equal thing
+                done()
+
 
         it 'creates function stubs on object', (done) -> 
 
@@ -54,3 +60,4 @@ describe 'does', ->
                 thing.function1.should.be.an.instanceof Function
                 thing.function2.should.be.an.instanceof Function
                 done()        
+
