@@ -1,6 +1,6 @@
 {
   "name": "does",
-  "description": "pending",
+  "description": "For expectations",
   "version": "0.0.1",
   "author": "nomilous <nomilous@gmail.com>",
   "contributors": [
@@ -12,5 +12,10 @@
   "main": "./lib/does",
   "repository": "git@github.com:nomilous/does.git",
   "dependencies": {},
-  "devDependencies": {}
+  "devDependencies": {
+    "hound": "~1.0.4",
+    "should": "~2.0.2",
+    "coffee-script": "~1.6.3",
+    "mocha": "~1.13.0"
+  }
 }
