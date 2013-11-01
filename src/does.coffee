@@ -43,7 +43,12 @@ module.exports.does  = (config = {}) ->
 
             id = ++seq
 
-            object.does = ->
+            object.does = (expectations) ->
+
+                for e of expectations
+
+                    object[e] = expectations[e]
+
             
             action.resolve object
 

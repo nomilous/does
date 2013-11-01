@@ -17,13 +17,13 @@ describe 'does', ->
         done()
 
 
-    it 'defines instate() to anoint something with spectatability', (done) -> 
+    it 'defines spectate() to anoint something with spectatability', (done) -> 
 
         does().spectate.should.be.an.instanceof Function
         done()
 
 
-    context 'instate()', -> 
+    context 'spectate()', -> 
 
         it 'creates object.does fuction', (done) -> 
 
@@ -39,3 +39,17 @@ describe 'does', ->
                                 # (to catch failing tests)
                                 #
 
+        it 'creates function stubs on object', (done) -> 
+
+            thing = new class Thing
+
+            does().spectate( thing ).then (thing) -> 
+            
+                thing.does 
+
+                    function1: ->
+                    function2: ->
+
+                thing.function1.should.be.an.instanceof Function
+                thing.function2.should.be.an.instanceof Function
+                done()        
