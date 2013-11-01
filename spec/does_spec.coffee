@@ -19,3 +19,9 @@ describe 'does', ->
         does().verify.should.be.an.instanceof Function
         done()
 
+
+    it 'stores expectations internally in a hash', (done) -> 
+
+        instance = does()
+        _does().expectations.should.be.an.instanceof Object
+        done()

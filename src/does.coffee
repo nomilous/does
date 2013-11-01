@@ -1,10 +1,13 @@
 
+testable = undefined
 module.exports._does = -> testable 
 module.exports.does = (config = {}) -> 
     
     mode  = config.mode or 'spec'
 
-    if mode is 'spec' then local = testable = 
+    if mode is 'spec' then testable = local = 
+
+        expectations: {}
 
         expect: -> 
         verify: -> 
