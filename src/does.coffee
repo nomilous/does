@@ -7,7 +7,7 @@ module.exports.does = (config = {}) ->
 
     if mode is 'spec' then testable = local = 
 
-        expectations: {}
+        expects: {}
 
         expect: -> 
         verify: -> 
