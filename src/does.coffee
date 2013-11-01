@@ -5,14 +5,13 @@
 # --------------------------------
 #
 
-testable             = undefined
-module.exports._does = -> testable 
-module.exports.does  = (config = {}) -> 
+lastInstance    = undefined
+module.exports  = (config = {}) -> 
     
     mode  = config.mode or 'spec'
     seq   = 0
 
-    if mode is 'spec' then testable = local = 
+    if mode is 'spec' then lastInstance = local = 
 
         #
         # `local.expectations` - Houses currently active expectations 
@@ -69,4 +68,7 @@ module.exports.does  = (config = {}) ->
         spectate: local.spectate
         # expect: local.expect
         # verify: local.verify
+
+
+Object.defineProperty module.exports, '_test', get: -> -> lastInstance
 

@@ -1,4 +1,5 @@
-{does, _does} = require '../lib/does'
+does = require '../lib/does'
+
 
 describe 'does', -> 
 
@@ -13,7 +14,7 @@ describe 'does', ->
     it 'stores expectations internally in a hash', (done) -> 
 
         instance = does()
-        _does().expectations.should.be.an.instanceof Object
+        does._test().expectations.should.be.an.instanceof Object
         done()
 
 
