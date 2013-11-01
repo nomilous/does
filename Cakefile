@@ -23,6 +23,7 @@ runSpec = (fileOrFolder, after) ->
         '--colors',
         '--compilers', 
         'coffee:coffee-script', 
+        '--require', 'should'
         fileOrFolder
     ]
     test_runner.stdout.pipe process.stdout
