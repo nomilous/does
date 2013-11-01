@@ -61,3 +61,23 @@ describe 'does', ->
                 thing.function2.should.be.an.instanceof Function
                 done()        
 
+
+        it 'stores the "replaced" functions in the expectation record', ipso (done) -> 
+
+            thing = new class Thing
+
+                function1: -> ### original unfction1 ###
+                function2: -> ### original unfction2 ###
+
+            does().spectate( thing ).then (thing) -> 
+            
+                thing.does 
+
+                    function1: ->
+                    function2: ->
+
+                originals = does._test().expectations[1].originals
+
+                originals.function1.toString().should.match /original unfction1/
+                originals.function2.toString().should.match /original unfction2/
+                done()

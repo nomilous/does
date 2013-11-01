@@ -42,15 +42,25 @@ module.exports  = (config = {}) ->
 
             id = ++seq
 
-            local.expectations[id] = 
+            local.expectations[id] = record = 
 
                 object: object
+                originals: {}
 
             object.does = (expectations) ->
 
-                for e of expectations
+                #
+                # expectations as hash of functions to stub
+                #
 
-                    object[e] = expectations[e]
+                for fn of expectations
+
+                    #
+                    # keep original functions and replace on object
+                    #
+
+                    record.originals[fn] = object[fn]
+                    object[fn]   =   expectations[fn]
 
             
             action.resolve object
