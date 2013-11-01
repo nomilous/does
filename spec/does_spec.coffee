@@ -9,19 +9,24 @@ describe 'does', ->
             error.message.should.equal "does doesn't discombobulate"
             done()
 
-    it 'defines expect() to set expectations', (done) -> 
-
-        does().expect.should.be.an.instanceof Function
-        done()  
-
-    it 'defines verify() to determine if expectetions were met', (done) -> 
-
-        does().verify.should.be.an.instanceof Function
-        done()
-
 
     it 'stores expectations internally in a hash', (done) -> 
 
         instance = does()
         _does().expects.should.be.an.instanceof Object
         done()
+
+
+    it 'defines instate() to anoint and object with expectatability', (done) -> 
+
+        does().instate.should.be.an.instanceof Function
+        done()
+
+
+    context 'instate()', -> 
+
+
+
+
+
+
