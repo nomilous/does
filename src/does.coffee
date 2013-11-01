@@ -23,8 +23,8 @@ module.exports.does  = (config = {}) ->
 
 
         #
-        # `instate()` - Assigns .does() to an object
-        # ------------------------------------------
+        # `spectate()` - Assigns .does() to an object
+        # -------------------------------------------
         # 
         # * promise enables async call to involving www/db in 
         #   the creation of the definition of spectatable
@@ -32,7 +32,7 @@ module.exports.does  = (config = {}) ->
         # * each spectatable object is assigned an id
         # 
 
-        instate: deferred (action, object) -> 
+        spectate: deferred (action, object) -> 
 
 
 
@@ -61,7 +61,7 @@ module.exports.does  = (config = {}) ->
 
     return api = 
 
-        instate: local.instate
+        spectate: local.spectate
         # expect: local.expect
         # verify: local.verify
 

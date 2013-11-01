@@ -19,7 +19,7 @@ describe 'does', ->
 
     it 'defines instate() to anoint something with spectatability', (done) -> 
 
-        does().instate.should.be.an.instanceof Function
+        does().spectate.should.be.an.instanceof Function
         done()
 
 
@@ -29,7 +29,7 @@ describe 'does', ->
 
             thing = new class Thing
 
-            does().instate( thing ).then (thing) -> 
+            does().spectate( thing ).then (thing) -> 
 
                 thing.does.should.be.an.instanceof Function
                 done()
