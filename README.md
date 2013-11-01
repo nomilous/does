@@ -3,7 +3,7 @@
 
 
 
-For expectations.
+For spectatability.
 
 
 does

@@ -13,11 +13,11 @@ describe 'does', ->
     it 'stores expectations internally in a hash', (done) -> 
 
         instance = does()
-        _does().expects.should.be.an.instanceof Object
+        _does().expectations.should.be.an.instanceof Object
         done()
 
 
-    it 'defines instate() to anoint and object with expectatability', (done) -> 
+    it 'defines instate() to anoint something with spectatability', (done) -> 
 
         does().instate.should.be.an.instanceof Function
         done()
@@ -25,8 +25,17 @@ describe 'does', ->
 
     context 'instate()', -> 
 
+        it 'creates object.does fuction', (done) -> 
 
+            thing = new class Thing
 
+            does().instate( thing ).then (thing) -> 
 
+                thing.does.should.be.an.instanceof Function
+                done()
 
+                                #
+            .then (->), done    # promise rejects into done 
+                                # (to catch failing tests)
+                                #
 
