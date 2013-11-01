@@ -62,7 +62,7 @@ describe 'does', ->
                 done()        
 
 
-        it 'stores the "replaced" functions in the expectation record', ipso (done) -> 
+        it 'keeps the original "replaced" functions in the expectation record', ipso (done) -> 
 
             thing = new class Thing
 
