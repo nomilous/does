@@ -12,10 +12,11 @@ describe 'does', ->
             done()
 
 
-    it 'keeps reference to global "this" in scaffold.context', (done) -> 
+    it 'keeps reference to global "this" in scaffold.context and detects mocha', (done) -> 
 
         instance = does()
         does._test().scaffold.context.should.equal global
+        does._test().scaffold.type.should.equal 'mocha'
         done()
 
 

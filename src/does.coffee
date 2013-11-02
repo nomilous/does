@@ -14,7 +14,7 @@ module.exports  = (config = {}) ->
     #
     
     mode     = (try config.does.mode) or 'spec'
-    scaffold = try config.does.scaffold
+    scaffold = (try config.does.scaffold) or detect @
     seq      = 0
 
     if mode is 'spec' then lastInstance = local = 
@@ -245,7 +245,7 @@ expectations/:uuid:/properties  # later
                 # 
                 # mocha = require 'mocha'
                 # console.log mocha
-                # console.log context.Reporter.on
+                console.log local.scaffold.context # .Reporter  # integration hooks?
                 # 
                 #
 
@@ -270,5 +270,14 @@ expectations/:uuid:/properties  # later
         assert: local.assert
 
 
+detect = (context) -> 
+
+    return 'mocha' if ( 
+        context.xit? and context.xdescribe? and context.xcontext?
+    )
+
+
 Object.defineProperty module.exports, '_test', get: -> -> lastInstance
+
+
 
