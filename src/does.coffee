@@ -264,6 +264,16 @@ expectations/:uuid:/properties  # later
 
                 {object, type, spectator, functions} = local.expectations[uuid]
 
+                for fnName of functions
+
+                    {expects, original} = functions[fnName]
+                    
+                    expect = expects[0]
+
+                    console.log FUNCTION_EXPECTATION: expects
+
+
+
 
                 console.log cleanup: 1 unless typeof done is 'function'
                 console.log assert:  1 if     typeof done is 'function'
