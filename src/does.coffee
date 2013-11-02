@@ -95,7 +95,7 @@ expectations/:uuid:/properties  # later
                 else 'does'
 
 
-            if object[spectatorName]?
+            if object[spectatorName]? and object[spectatorName].active
 
                 #
                 # * TODO: verify() was not run after previous test, clean up and reset
@@ -123,6 +123,7 @@ expectations/:uuid:/properties  # later
                     object: object
                     type: try object.constructor.name 
                     functions:  {}
+                    spectator:  spectatorName
                     #properties: {}
 
                 
@@ -175,12 +176,13 @@ expectations/:uuid:/properties  # later
             #
 
             # # {object, functions, properties} = local.expectations[uuid]
-            {object, type, functions} = local.expectations[uuid]
+            {object, type, spectator, functions} = local.expectations[uuid]
             {expects, original} = functions[fnName] ||= 
                 expects: []
                 original: 
                     fn: object[fnName]
 
+            object[spectator].active = true
 
             if expects[0]?
 
@@ -221,20 +223,21 @@ expectations/:uuid:/properties  # later
         # --------------------------------------------
         #
 
-        verify: -> 
+        verify: deferred (action) -> 
 
-            # for uuid of local.expectations
+            for uuid of local.expectations
+
+                {object, type, spectator, functions} = local.expectations[uuid]
 
 
-            #     console.log local.expectations[uuid]
-            #     # {object, functions} = local.expectations[uuid]
 
-            #     # constructor = ( try object.constructor.name ) || 'anon'
-            #     # for fn of functions
-            #     #     console.log 
-            #     #         object: constructor
-            #     #         fn: fn
+                # verify.
 
+
+
+                object[spectator].active = false
+
+            action.resolve()
 
 
 

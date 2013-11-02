@@ -36,6 +36,15 @@ describe 'does', ->
                 thing.does.uuid.should.equal 1
                 done()
 
+        it 'tags the spectateable as active', (done) -> 
+
+            thing = new class Thing
+            does().spectate( thing ).then (thing) -> 
+
+                thing.does fn: -> # first call to does activates spectator
+                thing.does.active.should.equal true
+                done()
+
 
         it 'creates the expectations record for the object', ipso (done) -> 
 
@@ -55,7 +64,6 @@ describe 'does', ->
             thing = new class ClassName
             does().spectate( thing ).then (@thing) => 
 
-                
                 uuid = @thing.does.uuid
                 @record = does._test().expectations[uuid]
                 done()
@@ -82,6 +90,11 @@ describe 'does', ->
 
             should.exist @record.functions
             @record.functions.should.eql {}
+
+        it 'spectator', -> 
+
+            should.exist @record.spectator
+            @record.spectator.should.equal 'does'
 
 
     it 'creates object.does fuction', ipso (done) -> 
@@ -296,10 +309,43 @@ describe 'does', ->
         done()
 
 
-    xcontext 'verify()', ->
+    context 'verify()', ->
 
 
-        it 'asserts all expectations', ipso (done) -> 
+        it 'tags all spectated objects as inactive (finished)', ipso (done) -> 
+
+            thing = new class Thing
+            instance = does()
+            instance.spectate( thing ).then (thing) -> 
+
+                thing.does fn: ->
+                thing.does.active.should.equal true
+
+                instance.verify().then -> 
+
+                    thing.does.active.should.equal false
+                    done()
+
+
+        it 'tags all spectated objects as inactive (finished)', ipso (done) -> 
+
+            thing = new class Thing
+                does: ->
+            instance = does()
+            instance.spectate( thing ).then (thing) -> 
+
+                thing.$does fn: ->
+                thing.$does.active.should.equal true
+                instance.verify().then -> 
+
+                    thing.$does.active.should.equal false
+                    done()
+
+
+
+
+
+        xit 'asserts all expectations', ipso (done) -> 
 
             thing = new class Thing
 
@@ -313,5 +359,5 @@ describe 'does', ->
 
                 instance.verify()
 
-        it 'restores original functions'
+        xit 'restores original functions'
 
