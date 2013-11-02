@@ -1,5 +1,6 @@
-does = require '../lib/does'
-ipso = require 'ipso'
+does   = require '../lib/does'
+ipso   = require 'ipso'
+should = require 'should'
 
 describe 'does', -> 
 
@@ -26,17 +27,7 @@ describe 'does', ->
 
     context 'spectate()', -> 
 
-        it 'creates object.does fuction', ipso (done) -> 
-
-            thing = new class Thing
-
-            does().spectate( thing ).then (thing) -> 
-
-                thing.does.should.be.an.instanceof Function
-                done()
-
-
-        it 'tags the spectateable with an identity', (done) -> 
+        it 'tags the spectateable with the uuid', (done) -> 
 
 
             thing = new class Thing
@@ -46,15 +37,67 @@ describe 'does', ->
                 done()
 
 
-        it 'stores the object in expectations', ipso (done) -> 
+        it 'creates the expectations record for the object', ipso (done) -> 
 
             thing = new class Thing
 
             does().spectate( thing ).then (thing) -> 
 
-                id = thing.does.uuid
-                does._test().expectations[id].object.should.equal thing
+                uuid = thing.does.uuid
+                should.exist does._test().expectations[uuid].object.should.equal thing
                 done()
+
+
+    context 'expectation records contains', -> 
+
+        before (done) -> 
+
+            thing = new class ClassName
+            does().spectate( thing ).then (@thing) => 
+
+                done()
+                uuid = @thing.does.uuid
+                @record = does._test().expectations[uuid]
+
+        it 'createdAt', -> 
+
+            should.exist @record.createdAt
+
+        xit 'contains timeout', -> 
+
+            should.exist @record.timeout
+
+        it 'object', -> 
+
+            should.exist @record.object
+            @record.object.should.equal @thing
+
+        it 'name', -> 
+
+            should.exist @record.name
+            @record.name.should.equal 'ClassName'
+
+        it 'functions', ->
+
+            should.exist @record.functions
+            @record.functions.should.eql {}
+
+
+
+
+
+
+    it 'creates object.does fuction', ipso (done) -> 
+
+        thing = new class Thing
+
+        does().spectate( thing ).then (thing) -> 
+
+            thing.does.should.be.an.instanceof Function
+            done()
+
+
+    xcontext 'does()', ->
 
 
         it 'creates function stubs on object', (done) -> 
@@ -128,16 +171,16 @@ describe 'does', ->
 
 
 
-    it 'defines verify() to assert all active expectations', (done) -> 
+    xit 'defines verify() to assert all active expectations', (done) -> 
 
         does().verify.should.be.an.instanceof Function
         done()
 
 
-    context 'verify()', ->
+    xcontext 'verify()', ->
 
 
-        it.only 'asserts all expectations', ipso (done) -> 
+        it 'asserts all expectations', ipso (done) -> 
 
             thing = new class Thing
 

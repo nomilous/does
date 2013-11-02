@@ -25,6 +25,9 @@ module.exports  = (config = {}) ->
 Storage Structure
 
 ```
+
+expectations/:uuid:/createdAt   # * Timestamp
+expectations/:uuid:/timeout     # * ((hopefully)) Timeout of the parent mocha test.
 expectations/:uuid:/object      # * Reference to object
 expectations/:uuid:/name        # * Constructor name (if present)
 expectations/:uuid:/functions   # * List of function expectations
@@ -39,6 +42,7 @@ expectations/:uuid:/functions/fnName/expects    # * Array of mock function conta
 
 ```
 expectations/:uuid:/functions/fnName/expects/0/called     # * Boolean - was it called
+expectations/:uuid:/functions/fnName/expects/0/count      # * (temporary) - count of calls
 expectations/:uuid:/functions/fnName/expects/0/pass       # * Boolean - should it call onward to origal function 
 expectations/:uuid:/functions/fnName/expects/0/fn         # * The function mocker
 expectations/:uuid:/functions/fnName/expects/0/stub       # * The stub function (wrapper)
@@ -48,6 +52,8 @@ expectations/:uuid:/functions/fnName/expects/0/stub       # * The stub function 
 * It calls the mocker as assigned by `object.does fnName: -> 'this fn is the mocker'`
 * It then calls the original if pass is true
 
+expectations/:uuid:/properties  # later
+
         ###
 
 
@@ -56,9 +62,10 @@ expectations/:uuid:/functions/fnName/expects/0/stub       # * The stub function 
         # -------------------------------------------
         # 
         # * promise enables async call to involving www/db in 
-        #   the creation of the definition of spectatable
+        #   the creation of the definition of spectatable or
+        #   for possible expectation persistance.
         #   
-        # * each spectatable object is assigned an id
+        # * each spectatable object is assigned a uuid
         # 
 
         spectate: deferred (action, object) -> 
@@ -68,12 +75,14 @@ expectations/:uuid:/functions/fnName/expects/0/stub       # * The stub function 
             ) unless object?
 
 
-            do (id = ++seq) ->
+            do (uuid = ++seq) ->
 
-                local.expectations[id] = 
+                local.expectations[uuid] = 
 
-                    name: try object.constructor.name
+                    createdAt: new Date
+                    #timeout: 2000
                     object: object
+                    name: try object.constructor.name 
                     functions:  {}
                     #properties: {}
 
@@ -102,11 +111,11 @@ expectations/:uuid:/functions/fnName/expects/0/stub       # * The stub function 
                         local.expectFn 
 
                             fnName: fnName
-                            uuid:  id
+                            uuid:  uuid
                             spy:   spy
                             fn:    fn
 
-                Object.defineProperty object.does, 'uuid', get: -> id
+                Object.defineProperty object.does, 'uuid', get: -> uuid
 
                 action.resolve object
 
