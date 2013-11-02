@@ -231,8 +231,34 @@ describe 'does', ->
                     thing.coolStuff()
 
 
+            it 'spy calls the mocker and the original function', ipso (facto) -> 
 
-    xit 'defines verify() to assert all active expectations', (done) -> 
+                does().spectate( 
+
+                    new class TypeOfThing
+
+                        constructor: (@property = 1) -> 
+                        coolStuff: -> @property += 2
+
+
+                ).then (thing) -> 
+
+                    thing.does 
+
+                        #
+                        # _denotes spy (original fn getts called after)
+                        #
+
+                        _coolStuff: -> @property = 9998
+
+
+                    thing.coolStuff()
+                    thing.property.should.equal 10000
+                    facto()
+
+
+
+    it 'defines verify() to assert all active expectations', (done) -> 
 
         does().verify.should.be.an.instanceof Function
         done()
@@ -254,4 +280,6 @@ describe 'does', ->
                 thing.does function1: ->
 
                 instance.verify()
+
+        it 'restores original functions'
 

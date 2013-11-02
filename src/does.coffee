@@ -154,7 +154,8 @@ expectations/:uuid:/properties  # later
 
                 expect.called = true
                 expect.count++
-
+                expect.fn.apply @, arguments
+                original.fn.apply @, arguments
                 
 
             else object[fnName] = stub = -> 
