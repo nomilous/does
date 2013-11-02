@@ -94,7 +94,7 @@ describe 'does', ->
 
     context 'does()', ->
 
-        before (done) -> 
+        beforeEach (done) -> 
 
             thing = new class SomeThing
                 constructor: (@property = 'value') ->
@@ -106,7 +106,7 @@ describe 'does', ->
                     'original2'
 
 
-            does().spectate( thing ).then (thing) =>
+            does().spectate( thing ).then (@thing) =>
 
                 thing.does
 
@@ -114,7 +114,7 @@ describe 'does', ->
                     _function2: -> ### stub 2 ###
 
 
-                uuid = thing.does.uuid
+                uuid = @thing.does.uuid
                 {functions} = does._test().expectations[uuid]
                 @functions = functions
                 done()
@@ -189,6 +189,33 @@ describe 'does', ->
                 @expects2.fn.toString().should.match /stub 2/
 
 
+            it 'replaces the original function', (done) -> 
+
+                @thing.function1.toString().should.match /mocker/
+                @thing.function2.toString().should.match /spy/
+                done()
+
+
+            it 'sets called to true when and increments count when called', (done) -> 
+
+                @expects1.called.should.equal false
+                @expects2.called.should.equal false
+
+                @thing.function1()
+                @thing.function2()
+                @thing.function2()
+
+                expects1 = does._test().expectations[1].functions.function1.expects[0]
+                expects2 = does._test().expectations[1].functions.function2.expects[0]
+
+                expects1.called.should.equal true
+                expects2.called.should.equal true
+                expects1.count.should.equal 1
+                expects2.count.should.equal 2
+                done()
+
+
+
         # it 'creates function stubs on object', (done) -> 
 
         #     thing = new class Thing
@@ -202,18 +229,6 @@ describe 'does', ->
 
         #         thing.function1.should.be.an.instanceof Function
         #         thing.function2.should.be.an.instanceof Function
-        #         done()
-
-
-        # it 'replaces existing functions', ipso (done) -> 
-
-        #     thing = new class Thing 
-        #         function1: -> 'original'
-
-        #     does().spectate( thing ).then (thing) -> 
-
-        #         thing.does function1: -> 'replaced'
-        #         thing.function1().should.equal 'replaced'
         #         done()
 
 

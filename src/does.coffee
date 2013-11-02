@@ -147,16 +147,31 @@ expectations/:uuid:/properties  # later
                 console.log "um? (##undecided: multiple expectations on function) - already expecting #{type}.#{fnName}"
                 return
 
+
+            if spy then object[fnName] = stub = -> 
+
+                ### STUB (spy) ###
+
+                expects[0].called = true
+                expects[0].count++
+                
+
+            else object[fnName] = stub = -> 
+
+                ### STUB (mocker) ###
+
+                expects[0].called = true
+                expects[0].count++
+
+
             expects[0] = 
 
                 called: false
                 count:  0
                 #break: false
-                stub: -> ## STUB ##
+                stub: stub
                 spy: spy
                 fn: fn
-
-
 
 
 
