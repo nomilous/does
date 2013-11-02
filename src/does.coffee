@@ -45,7 +45,7 @@ expectations/:uuid:/functions/fnName/expects    # * Array of mock function conta
 ```
 expectations/:uuid:/functions/fnName/expects/0/called     # * Boolean - was it called
 expectations/:uuid:/functions/fnName/expects/0/count      # * (temporary) - count of calls
-expectations/:uuid:/functions/fnName/expects/0/break      # * (later) - sets a breakpoint - COMPLEXITY: test timeout
+expectations/:uuid:/functions/fnName/expects/0/break      # * (later) - sets a breakpoint - COMPLEXITIES: test timeouts, runs respawn new process
 expectations/:uuid:/functions/fnName/expects/0/stub       # * The stub function (wrapper)
 expectations/:uuid:/functions/fnName/expects/0/spy        # * Boolean - should it call onward to origal function 
 expectations/:uuid:/functions/fnName/expects/0/fn         # * The function mocker
