@@ -41,6 +41,7 @@ expectations/:uuid:/timeout     # * ((hopefully)) Timeout of the parent mocha te
 expectations/:uuid:/object      # * Reference to object
 expectations/:uuid:/type        # * Constructor name (if present) ##undecided
 expectations/:uuid:/functions   # * List of function expectations
+expectations/:uuid:/spectator   # * Spectator function name (does or $does)
 
 expectations/:uuid:/functions/fnName/original       # * Container for the original function
 expectations/:uuid:/functions/fnName/original/fn    # * Reference to the original function
