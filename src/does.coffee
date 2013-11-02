@@ -96,11 +96,13 @@ expectations/:uuid:/properties  # later
 
 
             #
-            # TODO: replace this with config.
+            # TODO: replace this with config.does.create (= (done, opts) -> ) if present
+            #       to enable db/www involvement in per object expectateability creation
+            # 
+            #       already a promise resident (COMPLEXITY: test timeout)
+            #       
             #
             do (uuid = ++seq) ->
-
-
 
                 local.expectations[uuid] = 
 
