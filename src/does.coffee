@@ -13,8 +13,9 @@ module.exports  = (config = {}) ->
     # NOTE: config extracted from config.does. enables a common superconfig (tree) with subsections per module
     #
     
-    mode  = (try config.does.mode) or 'spec'
-    seq   = 0
+    mode     = (try config.does.mode) or 'spec'
+    scaffold = try config.does.scaffold
+    seq      = 0
 
     if mode is 'spec' then lastInstance = local = 
     
@@ -23,6 +24,14 @@ module.exports  = (config = {}) ->
         # * TODO: property get and set expectations
         # 
         #
+
+        #
+        # keep original `this` of the spec scaffold
+        #
+
+        scaffold: 
+            context: @
+            type: scaffold
 
         expectations: {}
 
@@ -232,6 +241,13 @@ expectations/:uuid:/properties  # later
 
                 {object, type, spectator, functions} = local.expectations[uuid]
 
+                # 
+                # 
+                # mocha = require 'mocha'
+                # console.log mocha
+                # console.log context.Reporter.on
+                # 
+                #
 
 
                 # verify.

@@ -12,6 +12,13 @@ describe 'does', ->
             done()
 
 
+    it 'keeps reference to global "this" in scaffold.context', (done) -> 
+
+        instance = does()
+        does._test().scaffold.context.should.equal global
+        done()
+
+
     it 'stores expectations internally in a hash', (done) -> 
 
         instance = does()
