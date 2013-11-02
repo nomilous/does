@@ -309,6 +309,37 @@ describe 'does', ->
                 thing.property.should.equal 10000
                 facto()
 
+    it 'defines local.flush() to remove all stubs', (done) -> 
+
+        does()
+        does._test().flush.should.be.an.instanceof Function
+        done()
+
+    context 'flush()', -> 
+
+        it 'removes stubbed functions from spectated objects', ipso (facto) -> 
+
+            does().spectate( new class Thing
+
+                function1: -> ### original ###
+
+            ).then (thing) -> 
+
+                thing.does 
+                    function1: -> 
+                    functionThatDoesNotExist: ->
+
+                thing.function1.toString().should.match /STUB/
+                thing.functionThatDoesNotExist.toString().should.match /STUB/
+
+                does._test().flush()
+
+                thing.function1.toString().should.not.match /STUB/
+                should.not.exist thing.functionThatDoesNotExist
+
+                facto()
+
+        it 'unstubs prototype expectations'
 
 
     it 'defines assert() to assert all active expectations', (done) -> 

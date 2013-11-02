@@ -138,7 +138,7 @@ expectations/:uuid:/properties  # later
                 #                     gonna hijack mocka's it() to forcibly integrate.
                 # 
 
-                local.assert()
+                local.flush()
 
 
 
@@ -255,6 +255,38 @@ expectations/:uuid:/properties  # later
                 fn: fn
 
         #
+        # `flush()` - Remove all stubs
+        # ----------------------------
+        #
+
+        flush: deferred (action) -> 
+
+            #
+            # TODO: unstub for case of prototypes (future instance methods) 
+            #
+
+            for uuid of local.expectations
+
+                {object, functions} = local.expectations[uuid]
+                
+                for fnName of functions
+
+                    {original} = functions[fnName]
+
+                    #
+                    # * if original function did not exist this
+                    #   will reset back to that situation. 
+                    # 
+                    # TODO: * perhaps warning when stubbing non-existant 
+                    #   function will come in handy
+                    # 
+
+                    object[fnName] = original.fn
+
+            action.resolve()
+
+
+        #
         # `assert()` - Asserts all expectations are met
         # ---------------------------------------------
         # 
@@ -284,8 +316,11 @@ expectations/:uuid:/properties  # later
 
                 object[spectator].active = false
 
-            action.resolve()
+            #
+            # TODO: Confirm that there ""ARE"" no known rejection cases for flush()
+            #       * this will need attention later
 
+            local.flush().then -> action.resolve()
 
 
 
