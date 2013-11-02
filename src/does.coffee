@@ -61,19 +61,19 @@ module.exports  = (config = {}) ->
                         if title.match /^_/
 
                             title = title[1..]
-                            orig  = true
+                            spy   = true
                             fn    = expectations["_#{title}"]
 
                         else
                             
-                            orig = false
-                            fn   = expectations[title]
+                            spy   = false
+                            fn    = expectations[title]
 
                         local.expect 
 
                             uuid:  id
                             title: title
-                            call:  orig
+                            spy:   spy
                             fn:    fn
 
                             #
@@ -87,7 +87,7 @@ module.exports  = (config = {}) ->
                 action.resolve object
 
 
-        expect: ({uuid, title, fn, call}) -> 
+        expect: ({uuid, title, fn, spy}) -> 
 
 
             #
@@ -96,7 +96,7 @@ module.exports  = (config = {}) ->
 
             record = local.expectations[uuid]
             record.originals[title] = record.object[title]
-            return record.object[title] = fn unless call
+            return record.object[title] = fn unless spy
 
             #
             # still call original function

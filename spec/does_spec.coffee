@@ -86,7 +86,7 @@ describe 'does', ->
 
 
 
-        it 'enables calling the oiginal function', ipso (done) ->
+        it 'enables calling the original function', ipso (done) ->
 
             thing = new class Thing 
                 constructor: (@property = 11110) ->
