@@ -97,6 +97,11 @@ expectations/:uuid:/properties  # later
                     functions:  {}
                     #properties: {}
 
+                
+                # object.does.once(expectations)
+                # object.does.count(N, expectations)
+                # TODO: object.does pushed into per function sequence (array)
+                #       when called resets the mock wrapper to next in sequence
                 object.does = (expectations) ->
 
                     #
