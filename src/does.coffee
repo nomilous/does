@@ -40,37 +40,51 @@ module.exports  = (config = {}) ->
             ) unless object?
 
 
-            id = ++seq
+            do (id = ++seq) ->
 
-            local.expectations[id] = record = 
+                local.expectations[id] = 
 
-                object: object
-                originals: {}
+                    object: object
+                    originals: {}
 
-            object.does = (expectations) ->
-
-                #
-                # expectations as hash of functions to stub
-                #
-
-                for fn of expectations
+                object.does = (expectations) ->
 
                     #
-                    # keep original functions and replace on object
+                    # expectations as hash of functions to stub
                     #
 
-                    record.originals[fn] = object[fn]
-                    object[fn]   =   expectations[fn]
+                    for title of expectations
 
-            
-            action.resolve object
+                        fn = expectations[title]
+
+                        local.expect 
+
+                            uuid:  id
+                            title: title
+                            fn:    fn
+
+                            #
+                            # realize: familiar 
+                            # (https://github.com/nomilous/realize/tree/develop)
+                            #
+
+                
+                action.resolve object
+
+
+        expect: ({uuid, title, fn}) -> 
+
+
+            #
+            # keep original functions and replace on object
+            #
+
+            record = local.expectations[uuid]
+            record.originals[title] = record.object[title]
+            record.object[title]    = fn
 
 
 
-
-
-
-        expect: -> 
         verify: -> 
 
 

@@ -59,7 +59,7 @@ describe 'does', ->
 
                 thing.function1.should.be.an.instanceof Function
                 thing.function2.should.be.an.instanceof Function
-                done()        
+                done()
 
 
         it 'keeps the original "replaced" functions in the expectation record', ipso (done) -> 
