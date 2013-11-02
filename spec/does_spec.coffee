@@ -81,3 +81,15 @@ describe 'does', ->
                 originals.function1.toString().should.match /original unfction1/
                 originals.function2.toString().should.match /original unfction2/
                 done()
+
+
+        it 'tags the spectateable with an identity', (done) -> 
+
+
+            thing = new class Thing
+            does().spectate( thing ).then (thing) -> 
+
+                thing.does.uuid.should.equal 1
+                done()
+
+

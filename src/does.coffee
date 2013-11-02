@@ -68,6 +68,7 @@ module.exports  = (config = {}) ->
                             # (https://github.com/nomilous/realize/tree/develop)
                             #
 
+                Object.defineProperty object.does, 'uuid', get: -> id
                 
                 action.resolve object
 
