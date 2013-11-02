@@ -8,8 +8,12 @@
 
 lastInstance    = undefined
 module.exports  = (config = {}) -> 
+
+    #
+    # NOTE: config extracted from config.does. enables a common superconfig (tree) with subsections per module
+    #
     
-    mode  = config.mode or 'spec'
+    mode  = (try config.does.mode) or 'spec'
     seq   = 0
 
     if mode is 'spec' then lastInstance = local = 
@@ -91,7 +95,12 @@ expectations/:uuid:/properties  # later
                 else 'does'
 
 
+            #
+            # TODO: replace this with config.
+            #
             do (uuid = ++seq) ->
+
+
 
                 local.expectations[uuid] = 
 

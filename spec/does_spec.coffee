@@ -6,7 +6,7 @@ describe 'does', ->
 
     it "doesn't discombobulate", (done) -> 
 
-        try does mode: 'discombobulate'
+        try does does: mode: 'discombobulate'
         catch error
             error.message.should.equal "does doesn't discombobulate"
             done()
