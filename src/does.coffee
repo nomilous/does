@@ -51,16 +51,29 @@ module.exports  = (config = {}) ->
 
                     #
                     # expectations as hash of functions to stub
+                    # -----------------------------------------
+                    # 
+                    # `_function` specifies a ""spy""
                     #
 
                     for title of expectations
 
-                        fn = expectations[title]
+                        if title.match /^_/
+
+                            title = title[1..]
+                            orig  = true
+                            fn    = expectations["_#{title}"]
+
+                        else
+                            
+                            orig = false
+                            fn   = expectations[title]
 
                         local.expect 
 
                             uuid:  id
                             title: title
+                            call:  orig
                             fn:    fn
 
                             #
@@ -68,12 +81,13 @@ module.exports  = (config = {}) ->
                             # (https://github.com/nomilous/realize/tree/develop)
                             #
 
+
                 Object.defineProperty object.does, 'uuid', get: -> id
-                
+
                 action.resolve object
 
 
-        expect: ({uuid, title, fn}) -> 
+        expect: ({uuid, title, fn, call}) -> 
 
 
             #
@@ -82,7 +96,16 @@ module.exports  = (config = {}) ->
 
             record = local.expectations[uuid]
             record.originals[title] = record.object[title]
-            record.object[title]    = fn
+            return record.object[title] = fn unless call
+
+            #
+            # still call original function
+            #
+
+            record.object[title] = -> 
+
+                fn.apply this, arguments
+                record.originals[title].apply this, arguments
 
 
 

@@ -36,13 +36,24 @@ describe 'does', ->
                 done()
 
 
+        it 'tags the spectateable with an identity', (done) -> 
+
+
+            thing = new class Thing
+            does().spectate( thing ).then (thing) -> 
+
+                thing.does.uuid.should.equal 1
+                done()
+
+
         it 'stores the object in expectations', ipso (done) -> 
 
             thing = new class Thing
 
             does().spectate( thing ).then (thing) -> 
 
-                does._test().expectations[1].object.should.equal thing
+                id = thing.does.uuid
+                does._test().expectations[id].object.should.equal thing
                 done()
 
 
@@ -59,6 +70,39 @@ describe 'does', ->
 
                 thing.function1.should.be.an.instanceof Function
                 thing.function2.should.be.an.instanceof Function
+                done()
+
+
+        it 'replaces existing functions', ipso (done) -> 
+
+            thing = new class Thing 
+                function1: -> 'original'
+
+            does().spectate( thing ).then (thing) -> 
+
+                thing.does function1: -> 'replaced'
+                thing.function1().should.equal 'replaced'
+                done()
+
+
+
+        it 'enables calling the oiginal function', ipso (done) ->
+
+            thing = new class Thing 
+                constructor: (@property = 11110) ->
+                function1: -> 'original'
+
+            does().spectate( thing ).then (thing) -> 
+
+                count = 0
+
+                thing.does
+
+                    _function1: -> count = ++@property
+
+
+                thing.function1().should.equal 'original'
+                count.should.equal 11111
                 done()
 
 
@@ -83,13 +127,7 @@ describe 'does', ->
                 done()
 
 
-        it 'tags the spectateable with an identity', (done) -> 
 
 
-            thing = new class Thing
-            does().spectate( thing ).then (thing) -> 
-
-                thing.does.uuid.should.equal 1
-                done()
 
 
