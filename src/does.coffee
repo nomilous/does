@@ -130,9 +130,12 @@ expectations/:uuid:/properties  # later
                 #             
                 #             * TODO: consider benefits of ipso calling a mocha instance programatically 
                 #                     with a custom reporter to subscribe to the test event feed.
+                #                     * BIG pro: tester process can stay running, so node-inspector
+                #                                wont need a refresh to re-attach to v8 debug port
+                #                     * BUG con: tester does not start on 'clean slate'
                 # 
 
-                local.assert(false)
+                local.assert()
 
 
 
@@ -255,18 +258,15 @@ expectations/:uuid:/properties  # later
         # * this should be called after each test
         #
 
-        assert: deferred (action, throws = true) -> 
+        assert: deferred (action, done = null) -> 
 
             for uuid of local.expectations
 
                 {object, type, spectator, functions} = local.expectations[uuid]
 
 
-                
-                console.log cleanup: 1 unless throws 
-
-                # verify.
-
+                console.log cleanup: 1 unless typeof done is 'function'
+                console.log assert:  1 if     typeof done is 'function'
 
 
                 object[spectator].active = false
