@@ -189,14 +189,13 @@ describe 'does', ->
                 @expects2.fn.toString().should.match /stub 2/
 
 
-            it 'replaces the original function', (done) -> 
+            it 'replaces the original function', -> 
 
                 @thing.function1.toString().should.match /mocker/
                 @thing.function2.toString().should.match /spy/
-                done()
 
 
-            it 'sets called to true when and increments count when called', (done) -> 
+            it 'sets called to true and increments count when called', -> 
 
                 @expects1.called.should.equal false
                 @expects2.called.should.equal false
@@ -212,46 +211,24 @@ describe 'does', ->
                 expects2.called.should.equal true
                 expects1.count.should.equal 1
                 expects2.count.should.equal 2
-                done()
 
 
+            it 'stub calls the mocker', ipso (facto) -> 
 
-        # it 'creates function stubs on object', (done) -> 
+                does().spectate( 
 
-        #     thing = new class Thing
+                    new class TypeOfThing
 
-        #     does().spectate( thing ).then (thing) -> 
-            
-        #         thing.does 
+                ).then (thing) -> 
 
-        #             function1: ->
-        #             function2: ->
+                    thing.does 
+                        coolStuff: -> facto
+                            todo: 
+                                'what about class methods': """
+                                hmmm...
+                                """
 
-        #         thing.function1.should.be.an.instanceof Function
-        #         thing.function2.should.be.an.instanceof Function
-        #         done()
-
-
-
-        # it 'enables calling the original function', ipso (done) ->
-
-        #     thing = new class Thing 
-        #         constructor: (@property = 11110) ->
-        #         function1: -> 'original'
-
-        #     does().spectate( thing ).then (thing) -> 
-
-        #         count = 0
-
-        #         thing.does
-
-        #             _function1: -> count = ++@property
-
-
-        #         thing.function1().should.equal 'original'
-        #         count.should.equal 11111
-        #         done()
-
+                    thing.coolStuff()
 
 
 

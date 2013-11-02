@@ -1,8 +1,8 @@
 {deferred} = require 'also'
 
 #
-# does() - Creates "spectatability"
-# --------------------------------
+# does() - Creates "spectateability"
+# ----------------------------------
 #
 
 lastInstance    = undefined
@@ -155,6 +155,7 @@ expectations/:uuid:/properties  # later
                 expects[0].called = true
                 expects[0].count++
                 
+                
 
             else object[fnName] = stub = -> 
 
@@ -162,6 +163,7 @@ expectations/:uuid:/properties  # later
 
                 expects[0].called = true
                 expects[0].count++
+                expects[0].fn.apply @, arguments
 
 
             expects[0] = 
