@@ -91,6 +91,18 @@ describe 'does', ->
             thing.does.should.be.an.instanceof Function
             done()
 
+    it 'creates object.$does if object already defines does', ipso (done) -> 
+
+        does().spectate( 
+            new class ThingThatDoesAlready 
+                does: ->
+
+        ).then (thing) -> 
+
+            should.exist thing.$does
+            should.exist thing.$does.uuid 
+            done()
+
 
     context 'does()', ->
 
@@ -255,6 +267,26 @@ describe 'does', ->
                     thing.coolStuff()
                     thing.property.should.equal 10000
                     facto()
+
+    context '$does()', -> 
+
+        it 'works just like does does', ipso (facto) -> 
+
+            does().spectate( 
+
+                new class TypeOfThing
+
+                    constructor: (@property = 1) -> 
+                    does: ->
+                    coolStuff: -> @property += 2
+
+
+            ).then (thing) -> 
+
+                thing.$does _coolStuff: -> @property = 9998
+                thing.coolStuff()
+                thing.property.should.equal 10000
+                facto()
 
 
 

@@ -15,7 +15,6 @@ module.exports  = (config = {}) ->
     if mode is 'spec' then lastInstance = local = 
     
         # 
-        # * TODO: create .$does() if does() already exists and was not created by this
         # * TODO: class method / future (net yet created instance) function expectations
         # * TODO: property get and set expectations
         # 
@@ -85,6 +84,12 @@ expectations/:uuid:/properties  # later
                 "does can't expect undefined to do stuff"
             ) unless object?
 
+            
+
+            spectatorName = 
+                if object.does? and not object.does.uuid? then '$does'
+                else 'does'
+
 
             do (uuid = ++seq) ->
 
@@ -102,7 +107,7 @@ expectations/:uuid:/properties  # later
                 # object.does.count(N, expectations)
                 # TODO: object.does pushed into per function sequence (array)
                 #       when called resets the mock wrapper to next in sequence
-                object.does = (expectations) ->
+                object[spectatorName] = (expectations) ->
 
                     #
                     # expectations as hash of functions to stub
@@ -131,7 +136,7 @@ expectations/:uuid:/properties  # later
                             spy: spy
                             fn: fn
 
-                Object.defineProperty object.does, 'uuid', get: -> uuid
+                Object.defineProperty object[spectatorName], 'uuid', get: -> uuid
 
                 action.resolve object
 
