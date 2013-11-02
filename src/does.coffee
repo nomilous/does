@@ -108,13 +108,33 @@ expectations/:uuid:/properties  # later
             if object[spectatorName]? and object[spectatorName].active
 
                 #
-                # * TODO: verify() was not run after previous test, clean up and reset
+                # * TODO: assert() was not run after previous test, clean up and reset
                 #       * hopefully not necessary
                 #       * depends on whether or not access to test timeout is available
                 #         to call the verify in cases where test done() was not called.
-                #
+                # 
+                #             * nope: looks like the only integration vector is the Reporter
+                #               output that can get the timeout being reported on the suite 
+                #               as it starts up 
+                #                    * how to add a reporter to an already initialized
+                #                      mocha instance isn't clear (if at all possible)
+                #                    * getting access to per test timeout overrides appears 
+                #                      not to be possible
+                # 
+                #             * so there seems to be no way to report the reason of failure for a 
+                #               test that never called a function expectation as said failure to
+                #               call the function expectation - these tests will timeout in cases
+                #               where the done() proxy is call from within the unrun stub.
+                # 
+                #               (and the following code will clean up the expectations)
+                #             
+                #             * TODO: consider benefits of ipso calling a mocha instance programatically 
+                #                     with a custom reporter to subscribe to the test event feed.
+                # 
 
-                console.log TODO: 'clean up after previous test'
+                local.assert(false)
+
+
 
 
             #
@@ -235,20 +255,15 @@ expectations/:uuid:/properties  # later
         # * this should be called after each test
         #
 
-        assert: deferred (action) -> 
+        assert: deferred (action, throws = true) -> 
 
             for uuid of local.expectations
 
                 {object, type, spectator, functions} = local.expectations[uuid]
 
-                # 
-                # 
-                # mocha = require 'mocha'
-                # console.log mocha
-                console.log local.scaffold.context # .Reporter  # integration hooks?
-                # 
-                #
 
+                
+                console.log cleanup: 1 unless throws 
 
                 # verify.
 
