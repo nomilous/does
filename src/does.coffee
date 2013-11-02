@@ -76,10 +76,10 @@ expectations/:uuid:/properties  # later
         # -------------------------------------------
         # 
         # * promise enables async call to involving www/db in 
-        #   the creation of the definition of spectatable or
+        #   the creation of the definition of spectateable or
         #   for possible expectation persistance.
         #   
-        # * each spectatable object is assigned a uuid
+        # * each spectateable object is assigned a uuid
         # 
 
         spectate: deferred (action, object) -> 
