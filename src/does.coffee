@@ -95,6 +95,18 @@ expectations/:uuid:/properties  # later
                 else 'does'
 
 
+            if object[spectatorName]?
+
+                #
+                # * TODO: verify() was not run after previous test, clean up and reset
+                #       * hopefully not necessary
+                #       * depends on whether or not access to test timeout is available
+                #         to call the verify in cases where test done() was not called.
+                #
+
+                console.log TODO: 'clean up after previous test'
+
+
             #
             # TODO: replace this with config.does.create (= (done, opts) -> ) if present
             #       to enable db/www involvement in per object expectateability creation
