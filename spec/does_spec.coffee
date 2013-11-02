@@ -303,13 +303,13 @@ describe 'does', ->
 
 
 
-    it 'defines verify() to assert all active expectations', (done) -> 
+    it 'defines assert() to assert all active expectations', (done) -> 
 
-        does().verify.should.be.an.instanceof Function
+        does().assert.should.be.an.instanceof Function
         done()
 
 
-    context 'verify()', ->
+    context 'assert()', ->
 
 
         it 'tags all spectated objects as inactive (finished)', ipso (done) -> 
@@ -321,7 +321,7 @@ describe 'does', ->
                 thing.does fn: ->
                 thing.does.active.should.equal true
 
-                instance.verify().then -> 
+                instance.assert().then -> 
 
                     thing.does.active.should.equal false
                     done()
@@ -336,7 +336,7 @@ describe 'does', ->
 
                 thing.$does fn: ->
                 thing.$does.active.should.equal true
-                instance.verify().then -> 
+                instance.assert().then -> 
 
                     thing.$does.active.should.equal false
                     done()

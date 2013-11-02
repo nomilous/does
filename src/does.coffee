@@ -220,11 +220,13 @@ expectations/:uuid:/properties  # later
                 fn: fn
 
         #
-        # `verify()` - Verify all expectations are met
-        # --------------------------------------------
+        # `assert()` - Asserts all expectations are met
+        # ---------------------------------------------
+        # 
+        # * this should be called after each test
         #
 
-        verify: deferred (action) -> 
+        assert: deferred (action) -> 
 
             for uuid of local.expectations
 
@@ -249,7 +251,7 @@ expectations/:uuid:/properties  # later
 
         spectate: local.spectate
         # expect: local.expect
-        verify: local.verify
+        assert: local.assert
 
 
 Object.defineProperty module.exports, '_test', get: -> -> lastInstance
