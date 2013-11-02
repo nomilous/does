@@ -134,6 +134,9 @@ expectations/:uuid:/properties  # later
                 #                                wont need a refresh to re-attach to v8 debug port
                 #                     * BUG con: tester does not start on 'clean slate'
                 # 
+                #             * TODO: cleaning up stubs AFTER previous test is not good enough...
+                #                     gonna hijack mocka's it() to forcibly integrate.
+                # 
 
                 local.assert()
 
