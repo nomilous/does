@@ -29,7 +29,7 @@ Storage Structure
 expectations/:uuid:/createdAt   # * Timestamp
 expectations/:uuid:/timeout     # * ((hopefully)) Timeout of the parent mocha test.
 expectations/:uuid:/object      # * Reference to object
-expectations/:uuid:/class       # * Constructor name (if present)
+expectations/:uuid:/type        # * Constructor name (if present) ##undecided
 expectations/:uuid:/functions   # * List of function expectations
 
 expectations/:uuid:/functions/fnName/original       # * Container for the original function
@@ -45,14 +45,16 @@ expectations/:uuid:/functions/fnName/expects    # * Array of mock function conta
 ```
 expectations/:uuid:/functions/fnName/expects/0/called     # * Boolean - was it called
 expectations/:uuid:/functions/fnName/expects/0/count      # * (temporary) - count of calls
-expectations/:uuid:/functions/fnName/expects/0/pass       # * Boolean - should it call onward to origal function 
-expectations/:uuid:/functions/fnName/expects/0/fn         # * The function mocker
+expectations/:uuid:/functions/fnName/expects/0/break      # * (later) - sets a breakpoint - COMPLEXITY: test timeout
 expectations/:uuid:/functions/fnName/expects/0/stub       # * The stub function (wrapper)
+expectations/:uuid:/functions/fnName/expects/0/spy        # * Boolean - should it call onward to origal function 
+expectations/:uuid:/functions/fnName/expects/0/fn         # * The function mocker
+
 ```
 
 * The stub function (wrapper) substitutes the real function on the ""live"" object 
 * It calls the mocker as assigned by `object.does fnName: -> 'this fn is the mocker'`
-* It then calls the original if pass is true
+* It then calls the original if spy is true
 
 expectations/:uuid:/properties  # later
 
@@ -84,7 +86,7 @@ expectations/:uuid:/properties  # later
                     createdAt: new Date
                     #timeout: 2000
                     object: object
-                    class: try object.constructor.name 
+                    type: try object.constructor.name 
                     functions:  {}
                     #properties: {}
 
@@ -94,7 +96,7 @@ expectations/:uuid:/properties  # later
                     # expectations as hash of functions to stub
                     # -----------------------------------------
                     # 
-                    # `_function` specifies a ""spy""
+                    # `_function` specifies to "pass" to original function (spy)
                     #
 
                     for fnName of expectations
@@ -114,8 +116,8 @@ expectations/:uuid:/properties  # later
 
                             uuid:  uuid
                             fnName: fnName
-                            spy:   spy
-                            fn:    fn
+                            spy: spy
+                            fn: fn
 
                 Object.defineProperty object.does, 'uuid', get: -> uuid
 
@@ -133,11 +135,31 @@ expectations/:uuid:/properties  # later
             #
 
             # # {object, functions, properties} = local.expectations[uuid]
-            {object, functions} = local.expectations[uuid]
+            {object, type, functions} = local.expectations[uuid]
             {expects, original} = functions[fnName] ||= 
                 expects: []
                 original: 
                     fn: object[fnName]
+
+
+            if expects[0]?
+
+                console.log "um? (##undecided: multiple expectations on function) - already expecting #{type}.#{fnName}"
+                return
+
+            expects[0] = 
+
+                called: false
+                count:  0
+                #break: false
+                stub: -> ## STUB ##
+                spy: spy
+                fn: fn
+
+
+
+
+
 
 
 

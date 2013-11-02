@@ -73,10 +73,10 @@ describe 'does', ->
             should.exist @record.object
             @record.object.should.equal @thing
 
-        it 'name', -> 
+        it 'type', -> 
 
-            should.exist @record.class
-            @record.class.should.equal 'ClassName'
+            should.exist @record.type
+            @record.type.should.equal 'ClassName'
 
         it 'functions', ->
 
@@ -110,8 +110,9 @@ describe 'does', ->
 
                 thing.does
 
-                    function1: ->
-                    _function2: ->
+                    function1: ->  ### stub 1 ###   
+                    _function2: -> ### stub 2 ###
+
 
                 uuid = thing.does.uuid
                 {functions} = does._test().expectations[uuid]
@@ -119,7 +120,11 @@ describe 'does', ->
                 done()
 
 
-        it 'creates original function container', ->
+        it 'creates original subrecord', ->
+
+            #
+            # to carry reference to the original function
+            #
 
             should.exist original1 = @functions.function1.original
             should.exist original2 = @functions.function2.original
@@ -128,7 +133,60 @@ describe 'does', ->
             original2.fn.toString().should.match /original unfction2/
 
 
+        it 'creates expects subrecord', ->
 
+            #
+            # to store function expectations
+            #
+
+            should.exist expects1 = @functions.function1.expects
+            should.exist expects2 = @functions.function2.expects
+
+
+        context 'expects subrecord contains', -> 
+
+            before -> 
+
+                @expects1 = @functions.function1.expects[0]
+                @expects2 = @functions.function2.expects[0]
+
+
+            it 'called (has the function been called?)', -> 
+
+                should.exist @expects1.called
+                should.exist @expects2.called
+                @expects1.called.should.equal false
+                @expects2.called.should.equal false
+
+
+            it '[TEMPORARY] count (number of calls)', -> 
+
+                should.exist @expects1.count
+                should.exist @expects2.count
+                @expects1.count.should.equal 0
+                @expects2.count.should.equal 0
+
+            it 'stub (has the stub wrapper function)', -> 
+
+                should.exist @expects1.stub
+                should.exist @expects2.stub
+                @expects1.stub.should.be.an.instanceof Function
+                @expects2.stub.should.be.an.instanceof Function
+
+            it 'spy (flags whether or not to pass onward to original function', -> 
+
+                should.exist @expects1.spy
+                should.exist @expects2.spy
+                @expects1.spy.should.equal false
+                @expects2.spy.should.equal true
+
+
+            it 'fn (the stub / spy)', -> 
+
+                should.exist @expects1.fn
+                should.exist @expects2.fn
+                @expects1.fn.toString().should.match /stub 1/
+                @expects2.fn.toString().should.match /stub 2/
 
 
         # it 'creates function stubs on object', (done) -> 
