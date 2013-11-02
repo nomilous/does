@@ -128,6 +128,26 @@ describe 'does', ->
 
 
 
+    it 'defines verify() to assert all active expectations', (done) -> 
+
+        does().verify.should.be.an.instanceof Function
+        done()
 
 
+    context 'verify()', ->
+
+
+        it.only 'asserts all expectations', ipso (done) -> 
+
+            thing = new class Thing
+
+                function1: -> ### original unfction1 ###
+                function2: -> ### original unfction2 ###
+
+            instance = does()
+            instance.spectate( thing ).then (thing) -> 
+
+                thing.does function1: ->
+
+                instance.verify()
 
