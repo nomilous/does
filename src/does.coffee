@@ -46,7 +46,7 @@ expectations/:uuid:/functions/fnName/expects/0/stub       # * The stub function 
 
 * The stub function (wrapper) substitutes the real function on the ""live"" object 
 * It calls the mocker as assigned by `object.does fnName: -> 'this fn is the mocker'`
-* It then calls the original
+* It then calls the original if pass is true
 
         ###
 
