@@ -255,9 +255,9 @@ expectations/:uuid:/properties  # later
                 fn: fn
 
         #
-        # `flush()` - Remove all stubs
-        # ----------------------------
-        #
+        # `flush()` - Remove all stubs and delete active expectations
+        # -----------------------------------------------------------
+        # 
 
         flush: deferred (action) -> 
 
@@ -282,6 +282,8 @@ expectations/:uuid:/properties  # later
                     # 
 
                     object[fnName] = original.fn
+                    delete functions[fnName]
+
 
             action.resolve()
 

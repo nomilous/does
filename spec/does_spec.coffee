@@ -319,6 +319,7 @@ describe 'does', ->
 
         it 'removes stubbed functions from spectated objects', ipso (facto) -> 
 
+
             does().spectate( new class Thing
 
                 function1: -> ### original ###
@@ -334,10 +335,31 @@ describe 'does', ->
 
                 does._test().flush()
 
-                thing.function1.toString().should.not.match /STUB/
+                thing.function1.toString().should.match /original/
                 should.not.exist thing.functionThatDoesNotExist
 
                 facto()
+
+        it 'removes all active function expectations', ipso (facto) -> 
+
+            does().spectate( new class Thing
+
+                function1: -> ### original ###
+
+            ).then (thing) -> 
+
+                thing.does 
+                    function1: -> 
+
+                {functions} = does._test().expectations[1]
+                
+                should.exist functions.function1
+                does._test().flush().then -> 
+
+                    should.not.exist functions.function1
+                    facto()
+
+
 
         it 'unstubs prototype expectations'
 
