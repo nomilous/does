@@ -152,21 +152,21 @@ expectations/:uuid:/properties  # later
 
                 ### STUB (spy) ###
 
-                expects[0].called = true
-                expects[0].count++
-                
+                expect.called = true
+                expect.count++
+
                 
 
             else object[fnName] = stub = -> 
 
                 ### STUB (mocker) ###
 
-                expects[0].called = true
-                expects[0].count++
-                expects[0].fn.apply @, arguments
+                expect.called = true
+                expect.count++
+                expect.fn.apply @, arguments
 
 
-            expects[0] = 
+            expects[0] = expect = 
 
                 called: false
                 count:  0
