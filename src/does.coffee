@@ -29,10 +29,12 @@ Storage Structure
 expectations/:uuid:/createdAt   # * Timestamp
 expectations/:uuid:/timeout     # * ((hopefully)) Timeout of the parent mocha test.
 expectations/:uuid:/object      # * Reference to object
-expectations/:uuid:/name        # * Constructor name (if present)
+expectations/:uuid:/class       # * Constructor name (if present)
 expectations/:uuid:/functions   # * List of function expectations
 
-expectations/:uuid:/functions/fnName/original   # * Reference to the original function
+expectations/:uuid:/functions/fnName/original       # * Container for the original function
+expectations/:uuid:/functions/fnName/original/fn    # * Reference to the original function
+
 expectations/:uuid:/functions/fnName/expects    # * Array of mock function containers
 ```
 
@@ -82,7 +84,7 @@ expectations/:uuid:/properties  # later
                     createdAt: new Date
                     #timeout: 2000
                     object: object
-                    name: try object.constructor.name 
+                    class: try object.constructor.name 
                     functions:  {}
                     #properties: {}
 
@@ -101,7 +103,7 @@ expectations/:uuid:/properties  # later
 
                             fnName = fnName[1..]
                             spy    = true
-                            fn     = expectations["_#{title}"]
+                            fn     = expectations["_#{fnName}"]
 
                         else
                             
@@ -110,8 +112,8 @@ expectations/:uuid:/properties  # later
 
                         local.expectFn 
 
-                            fnName: fnName
                             uuid:  uuid
+                            fnName: fnName
                             spy:   spy
                             fn:    fn
 
@@ -131,12 +133,11 @@ expectations/:uuid:/properties  # later
             #
 
             # # {object, functions, properties} = local.expectations[uuid]
-            # {object, functions} = local.expectations[uuid]
-            # {expects, original} = functions[fnName] ||= 
-            #     expects: []
-            #     original: 
-            #         fn: object[fnName]
-
+            {object, functions} = local.expectations[uuid]
+            {expects, original} = functions[fnName] ||= 
+                expects: []
+                original: 
+                    fn: object[fnName]
 
 
 
