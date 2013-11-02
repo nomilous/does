@@ -243,10 +243,10 @@ describe 'does', ->
 
                 ).then (thing) -> 
 
-                    thing.does 
+                    thing.does
 
                         #
-                        # _denotes spy (original fn getts called after)
+                        # _denotes spy (original fn gets called after)
                         #
 
                         _coolStuff: -> @property = 9998

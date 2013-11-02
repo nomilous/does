@@ -5,6 +5,7 @@
 # ----------------------------------
 #
 
+
 lastInstance    = undefined
 module.exports  = (config = {}) -> 
     
@@ -12,7 +13,13 @@ module.exports  = (config = {}) ->
     seq   = 0
 
     if mode is 'spec' then lastInstance = local = 
-
+    
+        # 
+        # * TODO: create .$does() if does() already exists and was not created by this
+        # * TODO: class method / future (net yet created instance) function expectations
+        # * TODO: property get and set expectations
+        # 
+        #
 
         expectations: {}
 
@@ -175,24 +182,6 @@ expectations/:uuid:/properties  # later
                 stub: stub
                 spy: spy
                 fn: fn
-
-
-
-
-
-
-            # # record.functions.originals[title] = record.object[title]
-            # # return record.object[title] = fn unless spy
-
-            # # #
-            # # # still call original function
-            # # #
-
-            # # record.object[title] = -> 
-
-            # #     fn.apply this, arguments
-            # #     record.fn.originals[title].apply this, arguments
-
 
         #
         # `verify()` - Verify all expectations are met
