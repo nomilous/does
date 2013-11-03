@@ -383,9 +383,10 @@ describe 'does', ->
             instance.spectate( thing ).then (thing) -> 
 
                 thing.does fn: ->
+                thing.fn() 
                 thing.does.active.should.equal true
 
-                instance.assert().then -> 
+                instance.assert(->).then -> 
 
                     thing.does.active.should.equal false
                     done()
@@ -399,13 +400,12 @@ describe 'does', ->
             instance.spectate( thing ).then (thing) -> 
 
                 thing.$does fn: ->
+                thing.fn() 
                 thing.$does.active.should.equal true
-                instance.assert().then -> 
+                instance.assert(->).then -> 
 
                     thing.$does.active.should.equal false
                     done()
-
-
 
 
 

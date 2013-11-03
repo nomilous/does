@@ -1,4 +1,5 @@
 {deferred} = require 'also'
+should     = require 'should'
 
 #
 # does() - Creates "spectateability"
@@ -301,21 +302,37 @@ expectations/:uuid:/properties  # later
 
         assert: deferred (action, done = null) -> 
 
-            unless typeof done is 'function'
+            if typeof done is 'function'
+
+                expected = {}
+                resulted = {}
 
                 for uuid of local.expectations
 
                     {object, type, spectator, functions} = local.expectations[uuid]
 
+                    #
+                    # * Use built in JSON diff viewer to show (possibly multiple) 
+                    #   unmet function expectations
+                    #
+
+                    expected[uuid] = FuctionExpectations: {}
+                    resulted[uuid] = FuctionExpectations: {}
+
                     for fnName of functions
 
                         {expects, original} = functions[fnName]
-                        
                         expect = expects[0]
-
-                        console.log FUNCTION_EXPECTATION: expects
+                        call = "#{type}.#{fnName}()"
+                        expected[uuid].FuctionExpectations[call] = 'was called': true
+                        resulted[uuid].FuctionExpectations[call] = 'was called': expect.called
 
                     object[spectator].active = false
+
+                try resulted.should.eql expected
+                catch error
+                    done error
+                    action.reject error
 
             #
             # TODO: Confirm that there ""ARE"" no known rejection cases for flush()
