@@ -16,3 +16,5 @@ does
 ### todo
 
 * knowing when tests timeout (to cleanup stubs)
+* prototype expectations
+* property expectations
