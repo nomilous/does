@@ -13,9 +13,8 @@ module.exports  = (config = {}) ->
     # NOTE: config extracted from config.does. enables a common superconfig (tree) with subsections per module
     #
     
-    mode     = (try config.does.mode) or 'spec'
-    scaffold = (try config.does.scaffold) or detect @
-    seq      = 0
+    mode      = (try config.does.mode) or 'spec'
+    seq       = 0
 
     if mode is 'spec' then lastInstance = local = 
     
@@ -24,14 +23,6 @@ module.exports  = (config = {}) ->
         # * TODO: property get and set expectations
         # 
         #
-
-        #
-        # keep original `this` of the spec scaffold
-        #
-
-        scaffold: 
-            context: @
-            type: scaffold
 
         expectations: {}
 
@@ -135,10 +126,21 @@ expectations/:uuid:/properties  # later
                 #                     * BUG con: tester does not start on 'clean slate'
                 # 
                 #             * TODO: cleaning up stubs AFTER previous test is not good enough...
-                #                     gonna hijack mocka's it() to forcibly integrate.
+                #                     * if no subsequent test uses ipso with injections then stubbed
+                #                       modules will be left laying about.
+                #                     
+                #                     * additional complexities around funciton expectations set in
+                #                       before and beforeEach hooks.
+                #                     * NEED mocha reporter insert vector into already running mocha instance
+                # 
                 # 
 
                 local.flush()
+
+                #
+                # TODO: fix untidyness: this flush flushes ALL spectateds but is called
+                #       once for EACH inbound spectateable.
+                #
 
 
 
@@ -293,30 +295,27 @@ expectations/:uuid:/properties  # later
         # ---------------------------------------------
         # 
         # * this should be called after each test
+        # * it requires mocha's test resolver to "fail tests"
+        # * all stubs and expectations are flushed
         #
 
         assert: deferred (action, done = null) -> 
 
-            for uuid of local.expectations
+            unless typeof done is 'function'
 
-                {object, type, spectator, functions} = local.expectations[uuid]
+                for uuid of local.expectations
 
-                for fnName of functions
+                    {object, type, spectator, functions} = local.expectations[uuid]
 
-                    {expects, original} = functions[fnName]
-                    
-                    expect = expects[0]
+                    for fnName of functions
 
-                    console.log FUNCTION_EXPECTATION: expects
+                        {expects, original} = functions[fnName]
+                        
+                        expect = expects[0]
 
+                        console.log FUNCTION_EXPECTATION: expects
 
-
-
-                console.log cleanup: 1 unless typeof done is 'function'
-                console.log assert:  1 if     typeof done is 'function'
-
-
-                object[spectator].active = false
+                    object[spectator].active = false
 
             #
             # TODO: Confirm that there ""ARE"" no known rejection cases for flush()
