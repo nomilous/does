@@ -13,12 +13,6 @@ does
 .
 
 
-### todo / dev challenges
+### todo
 
-* mode 'spec', (to allow more systemic modes later)
-* wanr on setting expectation on non-existant function
-* create active mock / spy - replaces original
-* restoring original functions after
-* knowing when test ended
-    * 2 seconds default is easy (ish)
-    * mocha's `this.timeout(NNN)` more tricky to deal with
+* knowing when tests timeout (to cleanup stubs)

@@ -225,7 +225,7 @@ expectations/:uuid:/properties  # later
 
             if expects[0]?
 
-                console.log "um? (##undecided: multiple expectations on function) - already expecting #{type}.#{fnName}"
+                console.log "does doesn't support multiple expectations - already expecting #{type}.#{fnName}()"
                 return
 
 

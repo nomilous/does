@@ -383,7 +383,7 @@ describe 'does', ->
             instance.spectate( thing ).then (thing) -> 
 
                 thing.does fn: ->
-                thing.fn() 
+                thing.fn()
                 thing.does.active.should.equal true
 
                 instance.assert(->).then -> 
