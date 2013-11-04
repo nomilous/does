@@ -73,22 +73,22 @@ expectations/:uuid:/properties  # later
         ###
 
 
-        subscribe: ({source, event, data}) -> 
-
-            #
-            # wishlist
-            # --------
-            # 
-            # * Not PubSub
-            #
-            #   * promise/middleware pipeline for test scaffold makes more sense
-            #   * to participate instead of witness
-            # 
-            # 
-
-            return unless event is 'test end'
-
-            console.log DOES: data
+        #
+        # backed out of tighter integration with mocha 
+        #
+        # subscribe: ({source, event, data}) -> 
+        #     #
+        #     # wishlist
+        #     # --------
+        #     # 
+        #     # * Not PubSub
+        #     #
+        #     #   * promise/middleware pipeline for test scaffold makes more sense
+        #     #   * to participate instead of witness
+        #     # 
+        #     # 
+        #     return unless event is 'test end'
+        #     console.log DOES: data
 
 
 
@@ -366,8 +366,8 @@ expectations/:uuid:/properties  # later
     return api = 
 
         spectate:   local.spectate
-        subscribe:  local.subscribe
-        # expect: local.expect
+        # subscribe:  local.subscribe
+        # expect:     local.expect
         assert:     local.assert
 
 
