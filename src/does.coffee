@@ -103,7 +103,7 @@ expectations/:uuid:/properties  # later
         # * each spectateable object is assigned a uuid
         # 
 
-        spectate: deferred (action, object) -> 
+        spectate: deferred (action, name, object) -> 
 
             return action.reject new Error( 
                 "does can't expect undefined to do stuff"
@@ -180,6 +180,8 @@ expectations/:uuid:/properties  # later
                     #timeout: 2000
                     object: object
                     type: try object.constructor.name 
+                    name: name
+                    functionsCount: 0
                     functions:  {}
                     spectator:  spectatorName
                     #properties: {}
@@ -234,12 +236,14 @@ expectations/:uuid:/properties  # later
             #
 
             # # {object, functions, properties} = local.expectations[uuid]
-            {object, type, spectator, functions} = local.expectations[uuid]
+            expectation = local.expectations[uuid]
+            {object, type, spectator, functions} = expectation
             {expects, original} = functions[fnName] ||= 
                 expects: []
                 original: 
                     fn: object[fnName]
 
+            expectation.functionsCount++
             object[spectator].active = true
 
             if expects[0]?
@@ -306,6 +310,8 @@ expectations/:uuid:/properties  # later
                     object[fnName] = original.fn
                     delete functions[fnName]
 
+                delete local.expectations[uuid]
+
 
             action.resolve()
 
@@ -328,23 +334,25 @@ expectations/:uuid:/properties  # later
 
                 for uuid of local.expectations
 
-                    {object, type, spectator, functions} = local.expectations[uuid]
+                    {object, type, name, spectator, functionsCount, functions} = local.expectations[uuid]
 
                     #
                     # * Use built in JSON diff viewer to show (possibly multiple) 
                     #   unmet function expectations
                     #
 
-                    expected[uuid] = FuctionExpectations: {}
-                    resulted[uuid] = FuctionExpectations: {}
+                    continue unless functionsCount > 0
+
+                    expected[name] = functions: {}
+                    resulted[name] = functions: {}
 
                     for fnName of functions
 
                         {expects, original} = functions[fnName]
                         expect = expects[0]
                         call = "#{type}.#{fnName}()"
-                        expected[uuid].FuctionExpectations[call] = 'was called': true
-                        resulted[uuid].FuctionExpectations[call] = 'was called': expect.called
+                        expected[name].functions[call] = 'was called': true
+                        resulted[name].functions[call] = 'was called': expect.called
 
                     object[spectator].active = false
 

@@ -42,7 +42,7 @@ describe 'does', ->
 
 
             thing = new class Thing
-            does().spectate( thing ).then (thing) -> 
+            does().spectate( 'Thing', thing ).then (thing) -> 
 
                 thing.does.uuid.should.equal 1
                 done()
@@ -50,7 +50,7 @@ describe 'does', ->
         it 'tags the spectateable as active', (done) -> 
 
             thing = new class Thing
-            does().spectate( thing ).then (thing) -> 
+            does().spectate( 'Thing', thing ).then (thing) -> 
 
                 thing.does fn: -> # first call to does activates spectator
                 thing.does.active.should.equal true
@@ -61,7 +61,7 @@ describe 'does', ->
 
             thing = new class Thing
 
-            does().spectate( thing ).then (thing) -> 
+            does().spectate( 'Thing', thing ).then (thing) -> 
 
                 uuid = thing.does.uuid
                 should.exist does._test().expectations[uuid].object.should.equal thing
@@ -73,7 +73,7 @@ describe 'does', ->
         before (done) -> 
 
             thing = new class ClassName
-            does().spectate( thing ).then (@thing) => 
+            does().spectate( 'Thing', thing ).then (@thing) => 
 
                 uuid = @thing.does.uuid
                 @record = does._test().expectations[uuid]
@@ -97,6 +97,16 @@ describe 'does', ->
             should.exist @record.type
             @record.type.should.equal 'ClassName'
 
+        it 'name', -> 
+
+            should.exist @record.name
+            @record.name.should.equal 'Thing'
+
+        it 'functionsCount', ->
+
+            should.exist @record.functionsCount
+            @record.functionsCount.should.equal 0
+
         it 'functions', ->
 
             should.exist @record.functions
@@ -110,7 +120,7 @@ describe 'does', ->
 
     it 'creates object.does fuction', ipso (done) -> 
 
-        does().spectate( new class Thing ).then (thing) -> 
+        does().spectate( 'Thing', new class Thing ).then (thing) -> 
 
             thing.does.should.be.an.instanceof Function
             done()
@@ -118,6 +128,7 @@ describe 'does', ->
     it 'creates object.$does if object already defines does', ipso (done) -> 
 
         does().spectate( 
+            'ThingThatDoesAlready'
             new class ThingThatDoesAlready 
                 does: ->
 
@@ -142,7 +153,7 @@ describe 'does', ->
                     'original2'
 
 
-            does().spectate( thing ).then (@thing) =>
+            does().spectate( 'Thing', thing ).then (@thing) =>
 
                 thing.does
 
@@ -151,9 +162,14 @@ describe 'does', ->
 
 
                 uuid = @thing.does.uuid
-                {functions} = does._test().expectations[uuid]
+                {functionsCount, functions} = does._test().expectations[uuid]
                 @functions = functions
+                @functionsCount = functionsCount
                 done()
+
+        it 'increments the functionsCount', ->
+
+           @functionsCount.should.equal 2
 
 
         it 'creates original subrecord', ->
@@ -252,7 +268,7 @@ describe 'does', ->
             it 'stub calls the mocker', ipso (facto) -> 
 
                 does().spectate( 
-
+                    'TypeOfThing'
                     new class TypeOfThing
 
                 ).then (thing) -> 
@@ -270,7 +286,7 @@ describe 'does', ->
             it 'spy calls the mocker and the original function', ipso (facto) -> 
 
                 does().spectate( 
-
+                    'TypeOfThing'
                     new class TypeOfThing
 
                         constructor: (@property = 1) -> 
@@ -297,7 +313,7 @@ describe 'does', ->
         it 'works just like does does', ipso (facto) -> 
 
             does().spectate( 
-
+                'TypeOfThing'
                 new class TypeOfThing
 
                     constructor: (@property = 1) -> 
@@ -323,7 +339,7 @@ describe 'does', ->
         it 'removes stubbed functions from spectated objects', ipso (facto) -> 
 
 
-            does().spectate( new class Thing
+            does().spectate( 'Thing', new class Thing
 
                 function1: -> ### original ###
 
@@ -345,7 +361,7 @@ describe 'does', ->
 
         it 'removes all active function expectations', ipso (facto) -> 
 
-            does().spectate( new class Thing
+            does().spectate( 'Thing', new class Thing
 
                 function1: -> ### original ###
 
@@ -380,7 +396,7 @@ describe 'does', ->
 
             thing = new class Thing
             instance = does()
-            instance.spectate( thing ).then (thing) -> 
+            instance.spectate( 'Thing', thing ).then (thing) -> 
 
                 thing.does fn: ->
                 thing.fn()
@@ -397,7 +413,7 @@ describe 'does', ->
             thing = new class Thing
                 does: ->
             instance = does()
-            instance.spectate( thing ).then (thing) -> 
+            instance.spectate( 'Thing', thing ).then (thing) -> 
 
                 thing.$does fn: ->
                 thing.fn() 
@@ -417,7 +433,7 @@ describe 'does', ->
                 function2: -> ### original unfction2 ###
 
             instance = does()
-            instance.spectate( thing ).then (thing) -> 
+            instance.spectate( 'Thing', thing ).then (thing) -> 
 
                 thing.does function1: ->
 
