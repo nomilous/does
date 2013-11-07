@@ -31,7 +31,7 @@ describe 'does', ->
         # console.log does._test.README
         #
 
-        does._test().expectations.should.be.an.instanceof Object
+        does._test().spectacles.should.be.an.instanceof Object
         done()
 
 
@@ -69,7 +69,7 @@ describe 'does', ->
             does().spectate( name: 'Thing', thing ).then (thing) -> 
 
                 uuid = thing.does.uuid
-                should.exist does._test().expectations[uuid].object.should.equal thing
+                should.exist does._test().spectacles[uuid].object.should.equal thing
                 done()
 
 
@@ -81,7 +81,7 @@ describe 'does', ->
             does().spectate( name: 'Thing', thing ).then (@thing) => 
 
                 uuid = @thing.does.uuid
-                @record = does._test().expectations[uuid]
+                @record = does._test().spectacles[uuid]
                 done()
 
         it 'createdAt', -> 
@@ -174,7 +174,7 @@ describe 'does', ->
 
 
                 uuid = @thing.does.uuid
-                {functionsCount, functions} = does._test().expectations[uuid]
+                {functionsCount, functions} = does._test().spectacles[uuid]
                 @functions = functions
                 @functionsCount = functionsCount
                 done()
@@ -268,8 +268,8 @@ describe 'does', ->
                 @thing.function2()
                 @thing.function2()
 
-                expects1 = does._test().expectations[1].functions.function1.expects[0]
-                expects2 = does._test().expectations[1].functions.function2.expects[0]
+                expects1 = does._test().spectacles[1].functions.function1.expects[0]
+                expects2 = does._test().spectacles[1].functions.function2.expects[0]
 
                 expects1.called.should.equal true
                 expects2.called.should.equal true
@@ -359,8 +359,10 @@ describe 'does', ->
 
             .then -> 
 
-                does._test().expectations[1].tagged.should.equal true
+                does._test().spectacles[1].tagged.should.equal true
                 done()
+
+        it ''
 
 
 
@@ -425,7 +427,7 @@ describe 'does', ->
                     functionThatDoesNotExist: ->
 
 
-                {functions} = does._test().expectations[1]
+                {functions} = does._test().spectacles[1]
 
                 thing.function1()
                 thing.function1()
@@ -461,7 +463,7 @@ describe 'does', ->
                 thing.does 
                     function1: -> 
 
-                {functions} = does._test().expectations[1]
+                {functions} = does._test().spectacles[1]
                 
                 should.exist functions.function1
                 does._test().flush().then -> 

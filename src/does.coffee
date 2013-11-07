@@ -20,34 +20,34 @@ module.exports  = (config = {}) ->
     if mode is 'spec' then lastInstance = local = 
     
         # 
-        # * TODO: class method / future (net yet created instance) function expectations
+        # * TODO: prototype expectations
         # * TODO: property get and set expectations
         # 
         #
 
-        expectations: {}
+        spectacles: {} # ∞
 
         ###
 
 
-`local.expectations` - Houses currently active expectations 
------------------------------------------------------------
+`local.spectacles` - Houses currently active spectacles
+-------------------------------------------------------
 
 Storage Structure
 
 ```
 
-expectations/:uuid:/createdAt   # * Timestamp
-expectations/:uuid:/timeout     # * ((hopefully)) Timeout of the parent mocha test.
-expectations/:uuid:/object      # * Reference to object
-expectations/:uuid:/type        # * Constructor name (if present) ##undecided
-expectations/:uuid:/functions   # * List of function expectations
-expectations/:uuid:/spectator   # * Spectator function name (does or $does)
+spectacles/:uuid:/createdAt   # * Timestamp
+spectacles/:uuid:/timeout     # * ((hopefully)) Timeout of the parent mocha test.
+spectacles/:uuid:/object      # * Reference to object
+spectacles/:uuid:/type        # * Constructor name (if present) ##undecided
+spectacles/:uuid:/functions   # * List of function expectations
+spectacles/:uuid:/spectator   # * Spectator function name (does or $does)
 
-expectations/:uuid:/functions/fnName/original       # * Container for the original function
-expectations/:uuid:/functions/fnName/original/fn    # * Reference to the original function
+spectacles/:uuid:/functions/fnName/original       # * Container for the original function
+spectacles/:uuid:/functions/fnName/original/fn    # * Reference to the original function
 
-expectations/:uuid:/functions/fnName/expects    # * Array of mock function containers
+spectacles/:uuid:/functions/fnName/expects    # * Array of mock function containers
 ```
 
 * Currently only the first mock in the array is used
@@ -55,12 +55,12 @@ expectations/:uuid:/functions/fnName/expects    # * Array of mock function conta
   one mock to be set up in a sequece
 
 ```
-expectations/:uuid:/functions/fnName/expects/0/called     # * Boolean - was it called
-expectations/:uuid:/functions/fnName/expects/0/count      # * (temporary) - count of calls
-expectations/:uuid:/functions/fnName/expects/0/break      # * (later) - sets a breakpoint - COMPLEXITIES: test timeouts, runs respawn new process
-expectations/:uuid:/functions/fnName/expects/0/stub       # * The stub function (wrapper)
-expectations/:uuid:/functions/fnName/expects/0/spy        # * Boolean - should it call onward to origal function 
-expectations/:uuid:/functions/fnName/expects/0/fn         # * The function mocker
+spectacles/:uuid:/functions/fnName/expects/0/called     # * Boolean - was it called
+spectacles/:uuid:/functions/fnName/expects/0/count      # * (temporary) - count of calls
+spectacles/:uuid:/functions/fnName/expects/0/break      # * (later) - sets a breakpoint - COMPLEXITIES: test timeouts, runs respawn new process
+spectacles/:uuid:/functions/fnName/expects/0/stub       # * The stub function (wrapper)
+spectacles/:uuid:/functions/fnName/expects/0/spy        # * Boolean - should it call onward to origal function 
+spectacles/:uuid:/functions/fnName/expects/0/fn         # * The function mocker
 
 ```
 
@@ -68,7 +68,7 @@ expectations/:uuid:/functions/fnName/expects/0/fn         # * The function mocke
 * It calls the mocker as assigned by `object.does fnName: -> 'this fn is the mocker'`
 * It then calls the original if spy is true
 
-expectations/:uuid:/properties  # later
+spectacles/:uuid:/properties  # later
 
         ###
 
@@ -174,7 +174,7 @@ expectations/:uuid:/properties  # later
             #
             do (uuid = ++seq) ->
 
-                local.expectations[uuid] = 
+                local.spectacles[uuid] = 
 
                     createdAt: new Date
                     #timeout: 2000
@@ -188,7 +188,7 @@ expectations/:uuid:/properties  # later
                     #properties: {}
 
                 
-                # object.does.once(expectations)
+                #
                 # object.does.count(N, expectations)
                 # TODO: object.does pushed into per function sequence (array)
                 #       when called resets the mock wrapper to next in sequence
@@ -240,8 +240,8 @@ expectations/:uuid:/properties  # later
             # keep original functions and replace on object
             #
 
-            # # {object, functions, properties} = local.expectations[uuid]
-            expectation = local.expectations[uuid]
+            # # {object, functions, properties} = local.spectacles[uuid]
+            expectation = local.spectacles[uuid]
             {object, type, spectator, functions} = expectation
             {expects, original} = functions[fnName] ||= 
                 expects: []
@@ -253,7 +253,7 @@ expectations/:uuid:/properties  # later
 
             if expects[0]?
 
-                console.log "does doesn't support multiple expectations - already expecting #{type}.#{fnName}()"
+                console.log "does doesn't currently support multiple spectacles - already spectating #{type}.#{fnName}()"
                 return
 
 
@@ -286,8 +286,10 @@ expectations/:uuid:/properties  # later
                 fn: fn
 
         #
-        # `flush()` - Remove all stubs and delete active expectations
-        # -----------------------------------------------------------
+        # `flush()` - Remove all stubs and delete active spectacles
+        # ---------------------------------------------------------
+        # 
+        # * does not delete tagged spectacles
         # 
 
         flush: deferred (action) -> 
@@ -296,9 +298,9 @@ expectations/:uuid:/properties  # later
             # TODO: unstub for case of prototypes (future instance methods) 
             #
 
-            for uuid of local.expectations
+            for uuid of local.spectacles
 
-                expectation = local.expectations[uuid]
+                expectation = local.spectacles[uuid]
                 {object, functions, tagged} = expectation
                 
                 for fnName of functions
@@ -323,7 +325,8 @@ expectations/:uuid:/properties  # later
                     object[fnName] = original.fn
                     delete functions[fnName]
 
-                delete local.expectations[uuid]
+                continue if tagged
+                delete local.spectacles[uuid]
 
 
             action.resolve()
@@ -335,7 +338,7 @@ expectations/:uuid:/properties  # later
         # 
         # * this should be called after each test
         # * it requires mocha's test resolver to "fail tests"
-        # * all stubs and expectations are flushed
+        # * all untagged stubs and spectacles are flushed
         #
 
         assert: deferred (action, done = null) -> 
@@ -345,9 +348,9 @@ expectations/:uuid:/properties  # later
                 expected = {}
                 resulted = {}
 
-                for uuid of local.expectations
+                for uuid of local.spectacles
 
-                    {object, type, name, spectator, functionsCount, functions} = local.expectations[uuid]
+                    {object, type, name, spectator, functionsCount, functions} = local.spectacles[uuid]
 
                     #
                     # * Use built in JSON diff viewer to show (possibly multiple) 
