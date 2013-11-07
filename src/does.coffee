@@ -41,6 +41,7 @@ spectacles/:uuid:/createdAt   # * Timestamp
 spectacles/:uuid:/timeout     # * ((hopefully)) Timeout of the parent mocha test.
 spectacles/:uuid:/object      # * Reference to object
 spectacles/:uuid:/type        # * Constructor name (if present) ##undecided
+spectacles/:uuid:/tagged      # * Is a special case spectacle
 spectacles/:uuid:/functions   # * List of function expectations
 spectacles/:uuid:/spectator   # * Spectator function name (does or $does)
 
@@ -74,7 +75,7 @@ spectacles/:uuid:/properties  # later
 
 
         #
-        # backed out of tighter integration with mocha 
+        # backed out of tighter integration with mocha (maybe later)
         #
         # subscribe: ({source, event, data}) -> 
         #     #
@@ -86,9 +87,34 @@ spectacles/:uuid:/properties  # later
         #     #   * promise/middleware pipeline for test scaffold makes more sense
         #     #   * to participate instead of witness
         #     # 
+        #     # * an ""end"" in active context (where possible)
+        #     # 
+        #     # it/hook... (done) -> 
+        #     #
+        #     #    @test.on 'test', (t) -> console.log t
+        #     #    # probably pointles # @test.on 'test end', (t) -> 
+        #     #    @test.on 'test timeout'
         #     # 
         #     return unless event is 'test end'
         #     console.log DOES: data
+
+
+
+        tagged: {}
+
+        ###
+
+
+`local.tagged` - Special case (designer) spectacles
+---------------------------------------------------
+
+* for spectated objcts that span the entire run (not flushed at each it)
+* see also ipso.save() https://github.com/nomilous/ipso/commit/d73f6ec3df301201429a69df4d11fc984d5d75d3
+
+tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
+
+        ###
+
 
 
 
@@ -174,7 +200,7 @@ spectacles/:uuid:/properties  # later
             #
             do (uuid = ++seq) ->
 
-                local.spectacles[uuid] = 
+                local.spectacles[uuid] = spectacle = 
 
                     createdAt: new Date
                     #timeout: 2000
@@ -186,6 +212,8 @@ spectacles/:uuid:/properties  # later
                     functions:  {}
                     spectator:  spectatorName
                     #properties: {}
+
+                if opts.tagged then local.tagged[name] = object: spectacle
 
                 
                 #

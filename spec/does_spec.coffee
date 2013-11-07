@@ -362,7 +362,18 @@ describe 'does', ->
                 does._test().spectacles[1].tagged.should.equal true
                 done()
 
-        it ''
+        it 'stores tagged spectacles', (done) -> 
+
+            does().spectate
+                
+                tagged: true
+                name: 'Thing2'
+                class Thing
+
+            .then -> 
+
+                should.exist does._test().tagged.Thing2
+                done()
 
 
 
