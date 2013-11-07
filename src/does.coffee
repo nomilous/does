@@ -128,7 +128,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
             ) unless name?
 
             return callback new Error(
-                "does.get(opts) requires opts.query.tag"
+                "does has nothing with tag #{name}"
             ) unless local.tagged[name]?
 
             callback null, local.tagged[name].object
