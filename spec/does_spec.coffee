@@ -26,6 +26,11 @@ describe 'does', ->
     it 'stores expectations internally in a hash', (done) -> 
 
         instance = does()
+
+        #
+        # console.log does._test.README
+        #
+
         does._test().expectations.should.be.an.instanceof Object
         done()
 
@@ -339,6 +344,24 @@ describe 'does', ->
         does()
         does._test().flush.should.be.an.instanceof Function
         done()
+
+    context 'opts.tagged', -> 
+
+        it is: 'for longevity of spectation', ->
+
+        it 'sets a spectatable object as tagged', ipso (done) -> 
+
+            does().spectate
+                
+                tagged: true
+                name: 'Thing'
+                class Thing
+
+            .then -> 
+
+                does._test().expectations[1].tagged.should.equal true
+                done()
+
 
 
     context 'flush()', -> 

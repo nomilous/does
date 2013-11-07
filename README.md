@@ -9,45 +9,75 @@ For spectateability.
 does
 ====
 
-for use via [ipso](https://github.com/nomilous/ipso/tree/master) injector
+### use via [ipso](https://github.com/nomilous/ipso/tree/master) injection decorator
 
 
 ```coffee
 
-ipso  = require 'ipso'
-
-start = ({port}) -> 
+module.exports.start = ({port}) -> 
 
     server = require('http').createServer()
     server.listen port, -> console.log server.address()
 
+```
+```coffee
+
+ipso = require 'ipso'
 
 describe 'start()', ->
 
-    it 'starts http at config.port', ipso (facto, http) ->
+    it 'starts http at config.port', ipso (facto, http, should) ->
 
         http.does 
             createServer: ->
-                listen: (port) -> 
+
+                #
+                # return mock server to test for listen( port )
+                #
+
+                listen: (port, hostname) -> 
+
                     port.should.equal 3000
+                    should.not.exist hostname
+
 
             #
             # _createServer: -> console.log '_ denotes spy'
             # 
 
-        #
-        # http.does singLullaby: ->
-        # 
 
         start port: 3000
         facto()
 
+```
 
+### use directly - 'spec' mode
+
+* Not recommended for direct use at this time.
+* Interface may change drastically.
+
+```coffee
+
+Does = require 'does' 
+does = Does does: mode: 'spec'
+
+does.spectate 
+    
+    name: 'ClassName'
+    tagged: true
+    new ClassName
+        constructor: ->
+        ...
+
+    (ClassName) -> 
+
+        ClassName.does(  ... 
+    
 ```
 
 
-### todo
+### Mode? 
 
-* knowing when tests timeout (to cleanup stubs / noitify failed function expectations)
-* prototype expectations
-* property expectations
+* Yes, mode.
+* See metadata.
+

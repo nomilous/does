@@ -399,7 +399,26 @@ detect = (context) ->
     )
 
 
-Object.defineProperty module.exports, '_test', get: -> -> lastInstance
+Object.defineProperty module.exports, '_test', 
+    enumerable: true
+    get: -> 
+        fn = -> lastInstance
+        fn.README = """
+
+            This `does._test()` exposes the entire internal structure of the 
+            most recently created instance of a does spectation object.
+
+            It is intended for does' own internal testing.
+
+            BE ADVISED! The structures may change drastically!
+
+            Once the design stabalizes a more formal interface for integration will be provided.
+
+            Thoughts, ideas and requests are welcome.
+
+        """
+        fn
+
 
 
 
