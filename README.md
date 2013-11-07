@@ -72,7 +72,15 @@ does.spectate
     (ClassName) -> 
 
         ClassName.does(  ... 
-    
+
+
+does.assert(  ->  ).then (->),(->)
+
+#
+# console.log does._test()
+# console.log does._test.README
+#
+
 ```
 
 
