@@ -294,9 +294,11 @@ expectations/:uuid:/properties  # later
 
             for uuid of local.expectations
 
-                {object, functions} = local.expectations[uuid]
+                {object, functions, tagged} = local.expectations[uuid]
                 
                 for fnName of functions
+
+                    continue if tagged
 
                     {original} = functions[fnName]
 

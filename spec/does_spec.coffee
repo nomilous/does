@@ -342,7 +342,7 @@ describe 'does', ->
 
     context 'flush()', -> 
 
-        it 'removes stubbed functions from spectated objects', ipso (facto) -> 
+        it 'removes stubbed functions from untagged spectated objects', ipso (facto) -> 
 
 
             does().spectate
@@ -363,6 +363,31 @@ describe 'does', ->
                 should.not.exist thing.functionThatDoesNotExist
 
                 facto()
+
+        it.only 'does not remove stubbed functions from tagged spectated objects', ipso (done) ->
+
+            does().spectate
+                name: 'Thing'
+                tagged: true
+                new class Thing
+                    function1: -> ### original ###
+
+            .then (thing) -> 
+                thing.does 
+                    function1: -> 
+                    functionThatDoesNotExist: ->
+
+                thing.function1.toString().should.match /STUB/
+                thing.functionThatDoesNotExist.toString().should.match /STUB/
+
+                does._test().flush()
+
+                thing.function1.toString().should.match /STUB/
+                thing.functionThatDoesNotExist.toString().should.match /STUB/
+
+                done()
+
+
 
         it 'removes all active function expectations', ipso (facto) -> 
 
