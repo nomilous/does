@@ -340,6 +340,7 @@ describe 'does', ->
         does._test().flush.should.be.an.instanceof Function
         done()
 
+
     context 'flush()', -> 
 
         it 'removes stubbed functions from untagged spectated objects', ipso (facto) -> 
@@ -364,7 +365,7 @@ describe 'does', ->
 
                 facto()
 
-        it.only 'does not remove stubbed functions from tagged spectated objects', ipso (done) ->
+        it 'does not remove stubbed functions from tagged spectated objects', ipso (done) ->
 
             does().spectate
                 name: 'Thing'
@@ -384,6 +385,43 @@ describe 'does', ->
 
                 thing.function1.toString().should.match /STUB/
                 thing.functionThatDoesNotExist.toString().should.match /STUB/
+
+                done()
+
+        it 'resets the expects on tagged spectated object functions', ipso (done) ->
+
+            does().spectate
+                name: 'Thing'
+                tagged: true
+                new class Thing
+                    function1: -> ### original ###
+
+            .then (thing) -> 
+                thing.does 
+                    function1: -> 
+                    functionThatDoesNotExist: ->
+
+
+                {functions} = does._test().expectations[1]
+
+                thing.function1()
+                thing.function1()
+                thing.function1()
+
+                functions.function1.expects[0].count.should.equal 3
+                functions.function1.expects[0].called.should.equal true
+
+                does._test().flush()
+
+                functions.function1.expects[0].count.should.equal 0
+                functions.function1.expects[0].called.should.equal false 
+
+                thing.function1()
+                thing.function1()
+                thing.function1()
+
+                functions.function1.expects[0].count.should.equal 3
+                functions.function1.expects[0].called.should.equal true
 
                 done()
 

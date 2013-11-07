@@ -227,7 +227,11 @@ expectations/:uuid:/properties  # later
 
         #
         # `expectFn()` - Sets an expectation on the object at uuid
-        # ------------------------------------------------------
+        # --------------------------------------------------------
+        # 
+        # * currently new expectations replace entries in expects[0] 
+        #      * that may change (to support expectation sequences)
+        #          * keep in mind tagged - do not flush
         # 
 
         expectFn: ({uuid, fnName, fn, spy}) -> 
@@ -294,11 +298,17 @@ expectations/:uuid:/properties  # later
 
             for uuid of local.expectations
 
-                {object, functions, tagged} = local.expectations[uuid]
+                expectation = local.expectations[uuid]
+                {object, functions, tagged} = expectation
                 
                 for fnName of functions
 
-                    continue if tagged
+                    if tagged
+
+                        {expects} = functions[fnName]
+                        expects[0].called = false
+                        expects[0].count  = 0
+                        continue
 
                     {original} = functions[fnName]
 
