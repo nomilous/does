@@ -103,13 +103,13 @@ expectations/:uuid:/properties  # later
         # * each spectateable object is assigned a uuid
         # 
 
-        spectate: deferred (action, name, object) -> 
+        spectate: deferred (action, opts, object) -> 
 
             return action.reject new Error( 
                 "does can't expect undefined to do stuff"
             ) unless object?
 
-            
+            name = opts.name
 
             spectatorName = 
                 if object.does? and not object.does.uuid? then '$does'
@@ -181,6 +181,7 @@ expectations/:uuid:/properties  # later
                     object: object
                     type: try object.constructor.name 
                     name: name
+                    tagged: opts.tagged or false
                     functionsCount: 0
                     functions:  {}
                     spectator:  spectatorName
