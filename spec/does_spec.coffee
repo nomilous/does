@@ -362,7 +362,7 @@ describe 'does', ->
                 does._test().spectacles[1].tagged.should.equal true
                 done()
 
-        it 'stores tagged spectacles', (done) -> 
+        it 'stores tagged spectacles', ipso (done) -> 
 
             does().spectate
                 
@@ -373,6 +373,27 @@ describe 'does', ->
             .then -> 
 
                 should.exist does._test().tagged.Thing2
+                done()
+
+        it 'rejects on duplicate tag', ipso (done) -> 
+
+            instance = does()
+
+            instance.spectate
+                
+                tagged: true
+                name: 'Thing3'
+                class Thing
+
+            .then -> instance.spectate
+
+                tagged: true
+                name: 'Thing3'
+                class Thing
+
+            .then (->), (error) -> 
+
+                error.should.match /does can\'t reassign tag Thing3/
                 done()
 
 

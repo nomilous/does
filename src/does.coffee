@@ -137,6 +137,13 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
             name = opts.name
 
+            return action.reject new Error( 
+                "does can't reassign tag #{name}"
+            ) if opts.tagged and local.tagged[name]?
+                                #
+                                # ##undecided - tagged keyed on name vs uuid
+                                # 
+
             spectatorName = 
                 if object.does? and not object.does.uuid? then '$does'
                 else 'does'
@@ -200,7 +207,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
             #
             do (uuid = ++seq) ->
 
-                local.spectacles[uuid] = spectacle = 
+                local.spectacles[uuid] = spectated = 
 
                     createdAt: new Date
                     #timeout: 2000
@@ -213,7 +220,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                     spectator:  spectatorName
                     #properties: {}
 
-                if opts.tagged then local.tagged[name] = object: spectacle
+                if opts.tagged then local.tagged[name] = object: spectated
 
                 
                 #
