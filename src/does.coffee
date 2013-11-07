@@ -115,6 +115,23 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
         ###
 
+        get: (opts, callback) -> 
+
+            #
+            # TODO: also support promise here (need later)
+            #
+
+            try name = opts.query.tag ##undecided
+
+            return callback new Error(
+                "does.get(opts) requires opts.query.tag"
+            ) unless name?
+
+            return callback new Error(
+                "does.get(opts) requires opts.query.tag"
+            ) unless local.tagged[name]?
+
+            callback null, local.tagged[name].object
 
 
 
@@ -288,7 +305,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
             if expects[0]?
 
-                console.log "does doesn't currently support multiple spectacles - already spectating #{type}.#{fnName}()"
+                console.log "does doesn't currently support multiple expectations - already spectating #{type}.#{fnName}()"
                 return
 
 
@@ -422,12 +439,17 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
     else throw new Error "does doesn't #{mode}" 
 
-    return api = 
+    routes = 
 
         spectate:   local.spectate
         # subscribe:  local.subscribe
         # expect:     local.expect
         assert:     local.assert
+        get:        local.get
+
+
+    routes.get.$api = {}    # vertex api
+    return routes
 
 
 detect = (context) -> 

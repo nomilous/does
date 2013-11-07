@@ -397,6 +397,25 @@ describe 'does', ->
                 done()
 
 
+        it 'can be put together again', ipso (facto) -> 
+
+            vertex = does()
+
+            vertex.spectate
+                
+                tagged: true
+                name: 'Humpty'
+                class Broken extends class Egg
+                    constructor: (@horses, @men) -> 
+
+            .then -> 
+
+                vertex.get query: tag: 'Humpty', (error, Jumpty) -> 
+
+                    Jumpty.name.should.equal 'Humpty'
+                    facto()
+
+
 
     context 'flush()', -> 
 
