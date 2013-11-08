@@ -83,20 +83,26 @@ describe 'does', ->
 
             instance = does()
             resolver = ->
-            instance.activate mode: 'spec', spec: 'THE TEST OR HOOK REF', context: 'CONTEXT', done: resolver
-            does._test().runtime.current.should.eql 
-                mode: 'spec'
-                spec:    'THE TEST OR HOOK REF'
-                context: 'CONTEXT'
-                done: resolver
+            spec = timer: _onTimeout: ->
+            instance.activate mode: 'spec', spec: spec, context: 'CONTEXT', resolver: resolver
+
+            current = does._test().runtime.current
+            current.mode.should.equal 'spec'
+            current.spec.should.eql  spec
+            current.context.should.equal 'CONTEXT'
+            current.resolver.should.equal resolver
+            #current.onTimeout.should.equal spec.timer._onTimeout
             done()
 
         it 'knows when called from mocha', (done) -> 
 
             instance = does()
-            instance.activate mode: 'spec', spec: 'THE TEST OR HOOK REF', context: 'CONTEXT'
+            spec = timer: _onTimeout: ->
+            instance.activate mode: 'spec', spec: spec, context: 'CONTEXT'
             does._test().runtime.name.should.equal 'mocha'
             done()
+
+
 
 
     context 'expectation records contains', -> 
