@@ -289,28 +289,30 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
             # resolve with exiting object if already spectating
             # -------------------------------------------------
             # 
+            # * TODO: each new spec creates a new spectation, 
+            #   uuid of tagged objects may need to follow along
 
-            if uuid = getUuid( object )
+            # if uuid = getUuid( object )
 
-                #
-                # * got a uuid assigned, will only still be present if created
-                #   by an ancestor context
-                #
+            #     #
+            #     # * got a uuid assigned, will only still be present if created
+            #     #   by an ancestor context
+            #     #
 
-                if existing = local.spectacles[uuid]
+            #     if existing = local.spectacles[uuid]
 
-                    if opts.tagged  # or existing.tagged
-                                    #
-                                    # incase of going back to new spectacle per test
-                                    #
-                        existing.tagged = true
-                        local.tagged[name] = object: existing
-                                    #
-                                    #
-                                    #
-                        # return action.resolve object
+            #         if opts.tagged  # or existing.tagged
+            #                         #
+            #                         # incase of going back to new spectacle per test
+            #                         #
+            #             existing.tagged = true
+            #             local.tagged[name] = object: existing
+            #                         #
+            #                         #
+            #                         #
+            #             # return action.resolve object
 
-                    return action.resolve object
+            #         return action.resolve object
 
 
             #
@@ -533,8 +535,11 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                         {expects, original} = functions[fnName]
                         expect = expects[0]
                         call = "#{type}.#{fnName}()"
-                        expected[name].functions[call] = 'was called': true
-                        resulted[name].functions[call] = 'was called': expect.called
+                        expected[name].functions[call] = 'was called'
+                        if expect.called
+                            resulted[name].functions[call] = 'was called'
+                        else
+                            resulted[name].functions[call] = 'was NOT called'
 
                     object[spectator].active = false
 

@@ -73,7 +73,7 @@ describe 'does', ->
                 done()
 
 
-        it 'returns existing spectation record if already spectating the object', ipso (done) -> 
+        xit 'returns existing spectation record if already spectating the object', ipso (done) -> 
 
             thing = new class Thing
 
@@ -641,7 +641,7 @@ describe 'does', ->
 
 
 
-        it '?REMOVE? tags all spectated objects as inactive (finished)', ipso (done) -> 
+        xit '?REMOVE? tags all spectated objects as inactive (finished)', ipso (done) -> 
 
             thing = new class Thing
             instance = does()
@@ -655,6 +655,7 @@ describe 'does', ->
                 thing.does fn: ->
                 thing.fn()
                 thing.does.active.should.equal true
+
 
                 instance.assert(->).then -> 
 
