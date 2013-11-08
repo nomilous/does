@@ -133,6 +133,20 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
             callback null, local.tagged[name].object
 
+        #
+        # `activate(runtime)` - Updates the current runtime
+        # -------------------------------------------------
+        # 
+        # * expects runtime.mode, runtime.spec, runtime.context
+        # * called from ipso before each test and hook
+        # * runtime.current contains the currently running test or hook
+        # 
+
+        runtime: {}
+
+        activate: (runtime) -> 
+
+            local.runtime.current = runtime
 
 
         #
@@ -446,6 +460,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
         # expect:     local.expect
         assert:     local.assert
         get:        local.get
+        activate:   local.activate
 
 
     routes.get.$api = {}    # vertex api

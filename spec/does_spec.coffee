@@ -72,6 +72,24 @@ describe 'does', ->
                 should.exist does._test().spectacles[uuid].object.should.equal thing
                 done()
 
+    it 'defines activate() to set runtime context', (done) -> 
+
+        does().activate.should.be.an.instanceof Function
+        done()
+
+    context 'activate()', -> 
+
+        it 'stores the provided runtime into runtime.current', (done) -> 
+
+            instance = does()
+            instance.activate mode: 'spec', spec: 'THE TEST OR HOOK REF', context: 'CONTEXT'
+            does._test().runtime.should.eql 
+                current:
+                    mode: 'spec'
+                    spec:    'THE TEST OR HOOK REF'
+                    context: 'CONTEXT'
+            done()
+
 
     context 'expectation records contains', -> 
 
