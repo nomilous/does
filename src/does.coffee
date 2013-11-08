@@ -167,7 +167,8 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
             #   was not made" rather than "the test timed out"
             # TODO: * flush all expectations that were not created in an ancestral beforeEach hook
             # TODO: * reset all expectations that were set in an ancestral beforeEach hook
-            # TODO: * do not allow function expectation declarations in beforeAll hooks (simplifies, for now)
+            # TODO: * function expectation declarations are inactive stubs if created in beforeAll hooks
+            #            * assert does not reject if the functions were not called
             # TODO: * ensure this handles @timeout() resetting
             #
 
@@ -179,7 +180,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                 # proxy original mocha timeout through the assert promise
                 #
 
-                local.assert().then( 
+                local.assert( runtime.resolver ).then( 
 
                     #
                     # resolved: no assert exception, onward to timeout
