@@ -138,9 +138,14 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
         # `activate(runtime)` - Updates the current runtime
         # -------------------------------------------------
         # 
-        # * expects runtime.mode, runtime.spec, runtime.context
         # * called from ipso before each test and hook
-        # * runtime.current contains the currently running test or hook
+        # * runtime.name contains 'mocha' (detected. the only supported)
+        # * runtime.current contains the runtime of currently running test or hook
+        # 
+        #       * current.mode     - is 'spec'
+        #       * current.spec     - is the hook or test running instance
+        #       * current.context  - is the hook or test context
+        #       * current.resolver - is the hook or test resolver (`done` function)
         # 
 
         runtime: {}
@@ -148,7 +153,10 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
         activate: (runtime) -> 
 
             local.runtime.current = runtime
-            local.runtime.name ||= detect(rootContext)
+            rname = local.runtime.name ||= detect(rootContext)
+
+            return unless rname is 'mocha'
+
 
         #
         # `spectate()` - Assigns .does() to an object

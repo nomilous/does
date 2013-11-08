@@ -82,11 +82,13 @@ describe 'does', ->
         it 'stores the provided runtime into runtime.current', (done) -> 
 
             instance = does()
-            instance.activate mode: 'spec', spec: 'THE TEST OR HOOK REF', context: 'CONTEXT'
+            resolver = ->
+            instance.activate mode: 'spec', spec: 'THE TEST OR HOOK REF', context: 'CONTEXT', done: resolver
             does._test().runtime.current.should.eql 
                 mode: 'spec'
                 spec:    'THE TEST OR HOOK REF'
                 context: 'CONTEXT'
+                done: resolver
             done()
 
         it 'knows when called from mocha', (done) -> 
