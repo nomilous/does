@@ -14,8 +14,9 @@ module.exports  = (config = {}) ->
     # NOTE: config extracted from config.does. enables a common superconfig (tree) with subsections per module
     #
     
-    mode      = (try config.does.mode) or 'spec'
-    seq       = 0
+    mode        = (try config.does.mode) or 'spec'
+    seq         = 0
+    rootContext = @
 
     if mode is 'spec' then lastInstance = local = 
     
@@ -147,7 +148,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
         activate: (runtime) -> 
 
             local.runtime.current = runtime
-
+            local.runtime.name ||= detect(rootContext)
 
         #
         # `spectate()` - Assigns .does() to an object

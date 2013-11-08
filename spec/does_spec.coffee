@@ -83,11 +83,17 @@ describe 'does', ->
 
             instance = does()
             instance.activate mode: 'spec', spec: 'THE TEST OR HOOK REF', context: 'CONTEXT'
-            does._test().runtime.should.eql 
-                current:
-                    mode: 'spec'
-                    spec:    'THE TEST OR HOOK REF'
-                    context: 'CONTEXT'
+            does._test().runtime.current.should.eql 
+                mode: 'spec'
+                spec:    'THE TEST OR HOOK REF'
+                context: 'CONTEXT'
+            done()
+
+        it 'knows when called from mocha', (done) -> 
+
+            instance = does()
+            instance.activate mode: 'spec', spec: 'THE TEST OR HOOK REF', context: 'CONTEXT'
+            does._test().runtime.name.should.equal 'mocha'
             done()
 
 
