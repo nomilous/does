@@ -593,12 +593,41 @@ describe 'does', ->
 
     context 'assert()', ->
 
+        it 'does not report failed to run function if runtime.current.spec is a hook', ipso (done) -> 
 
-        it 'tags all spectated objects as inactive (finished)', ipso (done) -> 
+            thing = new class Thing
+            instance = does()
+
+            instance.spectate( name: 'Thing', thing ).then (thing) -> 
+
+                instance.activate 
+                    spec: 
+                        type: 'hook'
+                        timer: {}
+
+                thing.does fn: ->
+                thing.does.active.should.equal true
+
+                instance.assert().then( 
+
+                    (result) -> done()
+                    (error)  -> done new Error 'should not run'
+
+                )
+
+
+
+
+        it '?REMOVE? tags all spectated objects as inactive (finished)', ipso (done) -> 
 
             thing = new class Thing
             instance = does()
             instance.spectate( name: 'Thing', thing ).then (thing) -> 
+
+                instance.activate 
+                    spec: 
+                        type: 'test'
+                        timer: {}
 
                 thing.does fn: ->
                 thing.fn()
@@ -608,23 +637,6 @@ describe 'does', ->
 
                     thing.does.active.should.equal false
                     done()
-
-
-        it 'tags all spectated objects as inactive (finished)', ipso (done) -> 
-
-            thing = new class Thing
-                does: ->
-            instance = does()
-            instance.spectate( name: 'Thing', thing ).then (thing) -> 
-
-                thing.$does fn: ->
-                thing.fn() 
-                thing.$does.active.should.equal true
-                instance.assert(->).then -> 
-
-                    thing.$does.active.should.equal false
-                    done()
-
 
 
         xit 'asserts all expectations', ipso (done) -> 

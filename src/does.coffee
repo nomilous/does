@@ -469,6 +469,9 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                                     #       got it in the runtime
                                     #
 
+            spec = local.runtime.current.spec
+            return action.resolve() unless spec.type is 'test'
+
             if typeof done is 'function'
 
                 expected = {}
