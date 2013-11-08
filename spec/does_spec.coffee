@@ -72,6 +72,29 @@ describe 'does', ->
                 should.exist does._test().spectacles[uuid].object.should.equal thing
                 done()
 
+
+        it 'returns existing spectation record if already spectating the object', ipso (done) -> 
+
+            thing = new class Thing
+
+            instance = does()
+            instance.spectate( name: 'Thing', thing )
+
+            .then (thing) -> 
+
+                thing.does.uuid.should.equal 1
+                instance.spectate( name: 'Thing2', thing )
+                                            #
+                                            # name will remain 'Thing' (?for now)
+                                            # 
+
+            .then (thing) -> 
+
+                thing.does.uuid.should.equal 1
+                done()
+
+
+
     it 'defines activate() to set runtime context', (done) -> 
 
         does().activate.should.be.an.instanceof Function

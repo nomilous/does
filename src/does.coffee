@@ -217,6 +217,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
         spectate: deferred (action, opts, object) -> 
 
+
             return action.reject new Error( 
                 "does can't expect undefined to do stuff"
             ) unless object?
@@ -282,6 +283,34 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                 #
 
 
+            
+
+            #
+            # resolve with exiting object if already spectating
+            # -------------------------------------------------
+            # 
+
+            if uuid = getUuid( object )
+
+                #
+                # * got a uuid assigned, will only still be present if created
+                #   by an ancestor context
+                #
+
+                if existing = local.spectacles[uuid]
+
+                    if opts.tagged  # or existing.tagged
+                                    #
+                                    # incase of going back to new spectacle per test
+                                    #
+                        existing.tagged = true
+                        local.tagged[name] = object: existing
+                                    #
+                                    #
+                                    #
+                        # return action.resolve object
+
+                    return action.resolve object
 
 
             #
@@ -295,10 +324,17 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
                 local.spectacles[uuid] = spectated = 
 
+                    uuid: uuid
                     createdAt: new Date
                     #timeout: 2000
                     object: object
-                    type: try object.constructor.name 
+                    type: try object.constructor.name
+
+                    #
+                    # * name will remain as it was on the first created spectacle
+                    # * that may become a problem  
+                    #
+
                     name: name
                     tagged: opts.tagged or false
                     functionsCount: 0
@@ -363,7 +399,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
             # # {object, functions, properties} = local.spectacles[uuid]
             expectation = local.spectacles[uuid]
-            {object, type, spectator, functions} = expectation
+            {object, type, tagged, spectator, functions} = expectation
             {expects, original} = functions[fnName] ||= 
                 expects: []
                 original: 
@@ -410,6 +446,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
         # `flush()` - Remove all stubs and delete active spectacles
         # ---------------------------------------------------------
         # 
+        # TODO: flush removes all spectations not created by an ancestor suite
         # * does not delete tagged spectacles
         # 
 
@@ -417,7 +454,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
             #
             # TODO: unstub for case of prototypes (future instance methods) 
-            #
+            # 
 
             for uuid of local.spectacles
 
@@ -469,8 +506,8 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                                     #       got it in the runtime
                                     #
 
-            spec = local.runtime.current.spec
-            return action.resolve() unless spec.type is 'test'
+            # spec = local.runtime.current.spec
+            # return action.resolve() unless spec.type is 'test'
 
             if typeof done is 'function'
 
@@ -535,6 +572,12 @@ detect = (context) ->
     return 'mocha' if ( 
         context.xit? and context.xdescribe? and context.xcontext?
     )
+
+getUuid = (object) -> 
+
+    try uuid = object.does.uuid
+    catch error
+        try uuid = object.$does.uuid
 
 
 Object.defineProperty module.exports, '_test', 
