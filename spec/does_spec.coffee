@@ -91,7 +91,6 @@ describe 'does', ->
             current.spec.should.eql  spec
             current.context.should.equal 'CONTEXT'
             current.resolver.should.equal resolver
-            #current.onTimeout.should.equal spec.timer._onTimeout
             done()
 
         it 'knows when called from mocha', (done) -> 
@@ -101,6 +100,33 @@ describe 'does', ->
             instance.activate mode: 'spec', spec: spec, context: 'CONTEXT'
             does._test().runtime.name.should.equal 'mocha'
             done()
+
+
+        it 'intercepts the test timeout and calls assert', ipso (done) -> 
+
+            ASSERTED = false
+            instance = does()
+            spec = 
+                title: 'title'
+                timer: _onTimeout: -> 
+
+                    #
+                    # mock original timeout
+                    #
+
+                    ASSERTED.should.equal true
+                    done()
+
+            instance.activate mode: 'spec', spec: spec, context: 'CONTEXT', resolver: ->
+            internal = does._test()
+            internal.assert = -> ASSERTED = true; then: (resolve) -> resolve()
+
+            #
+            # trigger original timeout
+            #
+
+            internal.runtime.current.spec.timer._onTimeout()
+
 
 
 

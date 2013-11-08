@@ -175,8 +175,31 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
             runtime.spec.timer._onTimeout = -> 
 
-                console.log TIMEOUT_IN_TEST: runtime.spec.title
-                local.runtime.onTimeout.call runtime.context
+                #
+                # proxy original mocha timeout through the assert promise
+                #
+
+                local.assert().then( 
+
+                    #
+                    # resolved: no assert exception, onward to timeout
+                    #
+
+                    -> local.runtime.onTimeout.call runtime.context
+
+                    #
+                    # call test resolver with the exception
+                    # 
+
+                    (exception) -> 
+
+                        console.log exception: expectation
+                        runtime.resolver exception
+
+                )
+
+
+
 
 
 
@@ -439,6 +462,11 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
         #
 
         assert: deferred (action, done = null) -> 
+
+                                    #
+                                    # TODO: dont need this done here any more
+                                    #       got it in the runtime
+                                    #
 
             if typeof done is 'function'
 
