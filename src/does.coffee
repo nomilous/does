@@ -454,6 +454,8 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
         flush: deferred (action) -> 
 
+            console.log "TODO: flush removes all spectations not created by an ancestor suite's hooks"
+
             #
             # TODO: unstub for case of prototypes (future instance methods) 
             # 
