@@ -155,49 +155,50 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
             local.runtime.current = runtime
             rname = local.runtime.name ||= detect(rootContext)
             return unless rname is 'mocha'
-
-            #
-            # replace timeout with a function that calls assert
-            # -------------------------------------------------
-            # 
-            # TODO: * this allows placing the resolver into a mock
-            # TODO: * if the mock is not run mocha will timeout but this replaced 
-            #   timeout handler first checks for any unrun function expectation 
-            #   stubs to more acurately report "an expected function call
-            #   was not made" rather than "the test timed out"
-            # TODO: * flush all expectations that were not created in an ancestral beforeEach hook
-            # TODO: * reset all expectations that were set in an ancestral beforeEach hook
-            # TODO: * function expectation declarations are inactive stubs if created in beforeAll hooks
-            #            * assert does not reject if the functions were not called
-            # TODO: * ensure this handles @timeout() resetting
-            #
-
-            local.runtime.onTimeout = runtime.spec.timer._onTimeout
-
-            runtime.spec.timer._onTimeout = -> 
+            if runtime.spec?
 
                 #
-                # proxy original mocha timeout through the assert promise
+                # replace timeout with a function that calls assert
+                # -------------------------------------------------
+                # 
+                # TODO: * this allows placing the resolver into a mock
+                # TODO: * if the mock is not run mocha will timeout but this replaced 
+                #   timeout handler first checks for any unrun function expectation 
+                #   stubs to more acurately report "an expected function call
+                #   was not made" rather than "the test timed out"
+                # TODO: * flush all expectations that were not created in an ancestral beforeEach hook
+                # TODO: * reset all expectations that were set in an ancestral beforeEach hook
+                # TODO: * function expectation declarations are inactive stubs if created in beforeAll hooks
+                #            * assert does not reject if the functions were not called
+                # TODO: * ensure this handles @timeout() resetting
                 #
 
-                local.assert( runtime.resolver ).then( 
+                local.runtime.onTimeout = runtime.spec.timer._onTimeout
+
+                runtime.spec.timer._onTimeout = -> 
 
                     #
-                    # resolved: no assert exception, onward to timeout
+                    # proxy original mocha timeout through the assert promise
                     #
 
-                    -> local.runtime.onTimeout.call runtime.context
+                    local.assert( runtime.resolver ).then( 
 
-                    #
-                    # call test resolver with the exception
-                    # 
+                        #
+                        # resolved: no assert exception, onward to timeout
+                        #
 
-                    (exception) -> 
+                        -> local.runtime.onTimeout.call runtime.context
 
-                        console.log exception: expectation
-                        runtime.resolver exception
+                        #
+                        # call test resolver with the exception
+                        # 
 
-                )
+                        (exception) -> 
+
+                            console.log exception: expectation
+                            runtime.resolver exception
+
+                    )
 
 
 
