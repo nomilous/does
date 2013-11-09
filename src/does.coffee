@@ -74,33 +74,6 @@ spectacles/:uuid:/properties  # later
 
         ###
 
-
-        #
-        # backed out of tighter integration with mocha (maybe later)
-        #
-        # subscribe: ({source, event, data}) -> 
-        #     #
-        #     # wishlist
-        #     # --------
-        #     # 
-        #     # * Not PubSub
-        #     #
-        #     #   * promise/middleware pipeline for test scaffold makes more sense
-        #     #   * to participate instead of witness
-        #     # 
-        #     # * an ""end"" in active context (where possible)
-        #     # 
-        #     # it/hook... (done) -> 
-        #     #
-        #     #    @test.on 'test', (t) -> console.log t
-        #     #    # probably pointles # @test.on 'test end', (t) -> 
-        #     #    @test.on 'test timeout'
-        #     # 
-        #     return unless event is 'test end'
-        #     console.log DOES: data
-
-
-
         tagged: {}
 
         ###
@@ -188,14 +161,14 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
                             -> local.runtime.onTimeout.call runtime.context
 
-                            #
-                            # call test resolver with the exception
-                            # 
-
                             (exception) -> 
 
-                                console.log exception: expectation
-                                runtime.resolver exception
+                                #
+                                # exception is raised into mocha's done() inside the assert,
+                                # nothing necessary here
+                                # 
+
+                                # runtime.resolver exception
 
                         )
 
@@ -260,43 +233,6 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
             #
 
             if object[spectatorName]? and object[spectatorName].active
-
-                #
-                # * TODO: assert() was not run after previous test, clean up and reset
-                #       * hopefully not necessary
-                #       * depends on whether or not access to test timeout is available
-                #         to call the verify in cases where test done() was not called.
-                # 
-                #             * nope: looks like the only integration vector is the Reporter
-                #               output that can get the timeout being reported on the suite 
-                #               as it starts up 
-                #                    * how to add a reporter to an already initialized
-                #                      mocha instance isn't clear (if at all possible)
-                #                    * getting access to per test timeout overrides appears 
-                #                      not to be possible
-                # 
-                #             * so there seems to be no way to report the reason of failure for a 
-                #               test that never called a function expectation as said failure to
-                #               call the function expectation - these tests will timeout in cases
-                #               where the done() proxy is call from within the unrun stub.
-                # 
-                #               (and the following code will clean up the expectations)
-                #             
-                #             * TODO: consider benefits of ipso calling a mocha instance programatically 
-                #                     with a custom reporter to subscribe to the test event feed.
-                #                     * BIG pro: tester process can stay running, so node-inspector
-                #                                wont need a refresh to re-attach to v8 debug port
-                #                     * BUG con: tester does not start on 'clean slate'
-                # 
-                #             * TODO: cleaning up stubs AFTER previous test is not good enough...
-                #                     * if no subsequent test uses ipso with injections then stubbed
-                #                       modules will be left laying about.
-                #                     
-                #                     * additional complexities around funciton expectations set in
-                #                       before and beforeEach hooks.
-                #                     * NEED mocha reporter insert vector into already running mocha instance
-                # 
-                # 
 
                 local.flush()
 
