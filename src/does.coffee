@@ -237,6 +237,11 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                 else 'does'
 
 
+
+            #
+            # TODO??: get rid of this preflush? now that cleanup can happen on test timeout
+            #
+
             if object[spectatorName]? and object[spectatorName].active
 
                 #
@@ -282,8 +287,6 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                 # TODO: fix untidyness: this flush flushes ALL spectateds but is called
                 #       once for EACH inbound spectateable.
                 #
-
-
             
 
             #
@@ -323,6 +326,8 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
             #       already a promise resident (COMPLEXITY: test timeout)
             #       
             #
+
+
             do (uuid = ++seq) ->
 
                 local.spectacles[uuid] = spectated = 
@@ -381,9 +386,103 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                             spy: spy
                             fn: fn
 
+                    return object # object.does().does() 
+
                 Object.defineProperty object[spectatorName], 'uuid', get: -> uuid
 
                 action.resolve object
+
+
+        #
+        # `spectateSync( opts, object )` - same as spectate
+        # ------------------------------------------------- 
+        #
+
+        spectateSync: (opts, object) ->
+
+            #
+            # TODO: duplicated from above, tidy
+            #
+
+            throw new Error( 
+                "does can't expect undefined to do stuff"
+            ) unless object?
+
+            name = opts.name
+
+            throw new Error( 
+                "does can't reassign tag #{name}"
+            ) if opts.tagged and local.tagged[name]?
+
+            spectatorName = 
+                if object.does? and not object.does.uuid? then '$does'
+                else 'does'
+
+
+            do (uuid = ++seq) ->
+
+                local.spectacles[uuid] = spectated = 
+
+                    uuid: uuid
+                    createdAt: new Date
+                    #timeout: 2000
+                    object: object
+                    type: try object.constructor.name
+
+                    #
+                    # * name will remain as it was on the first created spectacle
+                    # * that may become a problem  
+                    #
+
+                    name: name
+                    tagged: opts.tagged or false
+                    functionsCount: 0
+                    functions:  {}
+                    spectator:  spectatorName
+                    #properties: {}
+
+                if opts.tagged then local.tagged[name] = object: spectated
+
+                
+                #
+                # object.does.count(N, expectations)
+                # TODO: object.does pushed into per function sequence (array)
+                #       when called resets the mock wrapper to next in sequence
+                object[spectatorName] = (expectations) ->
+
+                    #
+                    # expectations as hash of functions to stub
+                    # -----------------------------------------
+                    # 
+                    # `_function` specifies to "pass" to original function (spy)
+                    #
+
+                    for fnName of expectations
+
+                        if fnName.match /^_/
+
+                            fnName = fnName[1..]
+                            spy    = true
+                            fn     = expectations["_#{fnName}"]
+
+                        else
+                            
+                            spy   = false
+                            fn    = expectations[fnName]
+
+                        local.expectFn 
+
+                            uuid:  uuid
+                            fnName: fnName
+                            spy: spy
+                            fn: fn
+
+                    return object # object.does().does() 
+
+                Object.defineProperty object[spectatorName], 'uuid', get: -> uuid
+
+                return object
+
 
         #
         # `expectFn()` - Sets an expectation on the object at uuid
@@ -563,12 +662,13 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
     routes = 
 
-        spectate:   local.spectate
+        spectate:     local.spectate
+        spectateSync: local.spectateSync
         # subscribe:  local.subscribe
         # expect:     local.expect
-        assert:     local.assert
-        get:        local.get
-        activate:   local.activate
+        assert:       local.assert
+        get:          local.get
+        activate:     local.activate
 
 
     routes.get.$api = {}    # vertex api

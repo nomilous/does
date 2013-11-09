@@ -93,6 +93,37 @@ describe 'does', ->
                 thing.does.uuid.should.equal 1
                 done()
 
+    it 'defines spectateSync() to anoint something with spectatability synchronously', (done) -> 
+
+        does().spectateSync.should.be.an.instanceof Function
+        done()
+
+    context 'spectateSync()', -> 
+
+        it 'reuturns the extended object instead of resolving it on a promise', ipso (done) ->
+
+
+            spectatable = does().spectateSync
+               
+                name: 'Thing'
+                class Thing
+
+            spectatable.does.should.be.an.instanceof Function
+            done()
+
+        it 'is chainable', ipso (done) -> 
+
+            spectatable = does().spectateSync
+               
+                name: 'Thing'
+                class Thing
+
+            next = spectatable.does 
+                function1: ->
+                function2: ->
+                    
+            next.should.equal spectatable
+            done()
 
 
     it 'defines activate() to set runtime context', (done) -> 
