@@ -158,49 +158,66 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
             if runtime.spec?
 
                 #
-                # replace timeout with a function that calls assert
-                # -------------------------------------------------
+                # HAC!
                 # 
-                # TODO: * this allows placing the resolver into a mock
-                # TODO: * if the mock is not run mocha will timeout but this replaced 
-                #   timeout handler first checks for any unrun function expectation 
-                #   stubs to more acurately report "an expected function call
-                #   was not made" rather than "the test timed out"
-                # TODO: * flush all expectations that were not created in an ancestral beforeEach hook
-                # TODO: * reset all expectations that were set in an ancestral beforeEach hook
-                # TODO: * function expectation declarations are inactive stubs if created in beforeAll hooks
-                #            * assert does not reject if the functions were not called
-                # TODO: * ensure this handles @timeout() resetting
+                # * do not want to see test timeouts when test resolve was not
+                #   called because the function expectation stub it should have 
+                #   been called from was not run.
+                # 
+                # * better to see that the function was not run
+                # 
+                # * this replaces the test timeout handler with a proxy that first 
+                #   asserts the function expectations
                 #
 
-                local.runtime.onTimeout = runtime.spec.timer._onTimeout
+                tapTimeout = ->
 
-                runtime.spec.timer._onTimeout = -> 
+                    local.runtime.onTimeout = runtime.spec.timer._onTimeout
+
+                    runtime.spec.timer._onTimeout = -> 
+
+                        #
+                        # proxy original mocha timeout through the assert promise
+                        #
+
+                        local.assert( runtime.resolver ).then( 
+
+                            #
+                            # resolved: no assert exception, onward to timeout
+                            #
+
+                            -> local.runtime.onTimeout.call runtime.context
+
+                            #
+                            # call test resolver with the exception
+                            # 
+
+                            (exception) -> 
+
+                                console.log exception: expectation
+                                runtime.resolver exception
+
+                        )
+
+                tapTimeout()
+
+                #
+                # * problem is that a new handler is created when @timeout is called
+                #   from in the test, tap that too
+                #
+
+                try original = runtime.context.timeout
+                # console.log original.toString()
+                # console.log runtime.context.runnable()
+
+                try runtime.context.timeout = (ms) -> 
 
                     #
-                    # proxy original mocha timeout through the assert promise
+                    # * let it do whatever it does in mocha, then re-tap
                     #
 
-                    local.assert( runtime.resolver ).then( 
-
-                        #
-                        # resolved: no assert exception, onward to timeout
-                        #
-
-                        -> local.runtime.onTimeout.call runtime.context
-
-                        #
-                        # call test resolver with the exception
-                        # 
-
-                        (exception) -> 
-
-                            console.log exception: expectation
-                            runtime.resolver exception
-
-                    )
-
-
+                    original.call runtime.context, ms
+                    tapTimeout()
 
 
 
