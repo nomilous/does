@@ -423,7 +423,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                 expect.called = true
                 expect.count++
                 expect.fn.apply @, arguments
-                original.fn.apply @, arguments
+                original.fn.apply @, arguments if original.fn?
                 
 
             else object[fnName] = stub = -> 
