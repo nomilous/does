@@ -263,18 +263,18 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
 
 
-            #
-            # TODO??: get rid of this preflush? now that cleanup can happen on test timeout
-            #
+            # #
+            # # TODO??: get rid of this preflush? now that cleanup can happen on test timeout
+            # #
 
-            if object[spectatorName]? and object[spectatorName].active
+            # if object[spectatorName]? and object[spectatorName].active
 
-                local.flush()
+            #     local.flush()
 
-                #
-                # TODO: fix untidyness: this flush flushes ALL spectateds but is called
-                #       once for EACH inbound spectateable.
-                #
+            #     #
+            #     # TODO: fix untidyness: this flush flushes ALL spectateds but is called
+            #     #       once for EACH inbound spectateable.
+            #     #
             
 
             #
@@ -544,54 +544,54 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                 spy: spy
                 fn: fn
 
-        #
-        # `flush()` - Remove all stubs and delete active spectacles
-        # ---------------------------------------------------------
-        # 
-        # TODO: flush removes all spectations not created by an ancestor suite
-        # * does not delete tagged spectacles
-        # 
+        # #
+        # # `flush()` - Remove all stubs and delete active spectacles
+        # # ---------------------------------------------------------
+        # # 
+        # # TODO: flush removes all spectations not created by an ancestor suite
+        # # * does not delete tagged spectacles
+        # # 
 
-        flush: deferred (action) -> 
+        # flush: deferred (action) -> 
 
-            console.log "TODO: flush removes all spectations not created by an ancestor suite's hooks"
+        #     console.log "TODO: flush removes all spectations not created by an ancestor suite's hooks"
 
-            #
-            # TODO: unstub for case of prototypes (future instance methods) 
-            # 
+        #     #
+        #     # TODO: unstub for case of prototypes (future instance methods) 
+        #     # 
 
-            for uuid of local.spectacles
+        #     for uuid of local.spectacles
 
-                expectation = local.spectacles[uuid]
-                {object, functions, tagged} = expectation
+        #         expectation = local.spectacles[uuid]
+        #         {object, functions, tagged} = expectation
                 
-                for fnName of functions
+        #         for fnName of functions
 
-                    if tagged
+        #             if tagged
 
-                        {expects} = functions[fnName]
-                        expects[0].called = false
-                        expects[0].count  = 0
-                        continue
+        #                 {expects} = functions[fnName]
+        #                 expects[0].called = false
+        #                 expects[0].count  = 0
+        #                 continue
 
-                    {original} = functions[fnName]
+        #             {original} = functions[fnName]
 
-                    #
-                    # * if original function did not exist this
-                    #   will reset back to that situation. 
-                    # 
-                    # TODO: * perhaps warning when stubbing non-existant 
-                    #   function will come in handy
-                    # 
+        #             #
+        #             # * if original function did not exist this
+        #             #   will reset back to that situation. 
+        #             # 
+        #             # TODO: * perhaps warning when stubbing non-existant 
+        #             #   function will come in handy
+        #             # 
 
-                    object[fnName] = original.fn
-                    delete functions[fnName]
+        #             object[fnName] = original.fn
+        #             delete functions[fnName]
 
-                continue if tagged
-                delete local.spectacles[uuid]
+        #         continue if tagged
+        #         delete local.spectacles[uuid]
 
 
-            action.resolve()
+        #     action.resolve()
 
 
         #
@@ -643,18 +643,20 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                         else
                             resulted[name].functions[call] = 'was NOT called'
 
-                    object[spectator].active = false
+                    # object[spectator].active = false
 
                 try resulted.should.eql expected
                 catch error
                     done error
                     action.reject error
 
-            #
-            # TODO: Confirm that there ""ARE"" no known rejection cases for flush()
-            #       * this will need attention later
+            # #
+            # # TODO: Confirm that there ""ARE"" no known rejection cases for flush()
+            # #       * this will need attention later
 
-            local.flush().then -> action.resolve()
+            # local.flush().then -> action.resolve()
+
+            action.resolve()
 
 
 

@@ -528,12 +528,6 @@ describe 'does', ->
                 thing.property.should.equal 10000
                 facto()
 
-    it 'defines local.flush() to remove all stubs', (done) -> 
-
-        does()
-        does._test().flush.should.be.an.instanceof Function
-        done()
-
     context 'opts.tagged', -> 
 
         it is: 'for longevity of spectation', ->
@@ -604,128 +598,133 @@ describe 'does', ->
                     Jumpty.name.should.equal 'Humpty'
                     facto()
 
+    # it 'defines local.flush() to remove all stubs', (done) -> 
+
+    #     does()
+    #     does._test().flush.should.be.an.instanceof Function
+    #     done()
 
 
-    context 'flush()', -> 
+    # context 'flush()', -> 
 
-        it 'removes stubbed functions from untagged spectated objects', ipso (facto) -> 
-
-
-            instance = does()
-            instance.spectate
-                name: 'Thing', new class Thing
-                    function1: -> ### original ###
-
-            .then (thing) => 
-
-                instance.activate @testActivation
-                thing.does 
-                    function1: -> 
-                    functionThatDoesNotExist: ->
-
-                thing.function1.toString().should.match /STUB/
-                thing.functionThatDoesNotExist.toString().should.match /STUB/
-
-                does._test().flush()
-
-                thing.function1.toString().should.match /original/
-                should.not.exist thing.functionThatDoesNotExist
-
-                facto()
-
-        it 'does not remove stubbed functions from tagged spectated objects', ipso (done) ->
-
-            instance = does()
-            instance.spectate
-                name: 'Thing'
-                tagged: true
-                new class Thing
-                    function1: -> ### original ###
-
-            .then (thing) => 
-
-                instance.activate @testActivation
-                thing.does 
-                    function1: -> 
-                    functionThatDoesNotExist: ->
-
-                thing.function1.toString().should.match /STUB/
-                thing.functionThatDoesNotExist.toString().should.match /STUB/
-
-                does._test().flush()
-
-                thing.function1.toString().should.match /STUB/
-                thing.functionThatDoesNotExist.toString().should.match /STUB/
-
-                done()
-
-        it 'resets the expects on tagged spectated object functions', ipso (done) ->
-
-            instance = does()
-            instance.spectate
-                name: 'Thing'
-                tagged: true
-                new class Thing
-                    function1: -> ### original ###
-
-            .then (thing) => 
-
-                instance.activate @testActivation
-                thing.does 
-                    function1: -> 
-                    functionThatDoesNotExist: ->
+    #     it 'removes stubbed functions from untagged spectated objects', ipso (facto) -> 
 
 
-                {functions} = does._test().spectacles[1]
+    #         instance = does()
+    #         instance.spectate
+    #             name: 'Thing', new class Thing
+    #                 function1: -> ### original ###
 
-                thing.function1()
-                thing.function1()
-                thing.function1()
+    #         .then (thing) => 
 
-                functions.function1.expects[0].count.should.equal 3
-                functions.function1.expects[0].called.should.equal true
+    #             instance.activate @testActivation
+    #             thing.does 
+    #                 function1: -> 
+    #                 functionThatDoesNotExist: ->
 
-                does._test().flush()
+    #             thing.function1.toString().should.match /STUB/
+    #             thing.functionThatDoesNotExist.toString().should.match /STUB/
 
-                functions.function1.expects[0].count.should.equal 0
-                functions.function1.expects[0].called.should.equal false 
+    #             does._test().flush()
 
-                thing.function1()
-                thing.function1()
-                thing.function1()
+    #             thing.function1.toString().should.match /original/
+    #             should.not.exist thing.functionThatDoesNotExist
 
-                functions.function1.expects[0].count.should.equal 3
-                functions.function1.expects[0].called.should.equal true
+    #             facto()
 
-                done()
+    #     it 'does not remove stubbed functions from tagged spectated objects', ipso (done) ->
+
+    #         instance = does()
+    #         instance.spectate
+    #             name: 'Thing'
+    #             tagged: true
+    #             new class Thing
+    #                 function1: -> ### original ###
+
+    #         .then (thing) => 
+
+    #             instance.activate @testActivation
+    #             thing.does 
+    #                 function1: -> 
+    #                 functionThatDoesNotExist: ->
+
+    #             thing.function1.toString().should.match /STUB/
+    #             thing.functionThatDoesNotExist.toString().should.match /STUB/
+
+    #             does._test().flush()
+
+    #             thing.function1.toString().should.match /STUB/
+    #             thing.functionThatDoesNotExist.toString().should.match /STUB/
+
+    #             done()
+
+    #     it 'resets the expects on tagged spectated object functions', ipso (done) ->
+
+    #         instance = does()
+    #         instance.spectate
+    #             name: 'Thing'
+    #             tagged: true
+    #             new class Thing
+    #                 function1: -> ### original ###
+
+    #         .then (thing) => 
+
+    #             instance.activate @testActivation
+    #             thing.does 
+    #                 function1: -> 
+    #                 functionThatDoesNotExist: ->
+
+
+    #             {functions} = does._test().spectacles[1]
+
+    #             thing.function1()
+    #             thing.function1()
+    #             thing.function1()
+
+    #             functions.function1.expects[0].count.should.equal 3
+    #             functions.function1.expects[0].called.should.equal true
+
+    #             does._test().flush()
+
+    #             functions.function1.expects[0].count.should.equal 0
+    #             functions.function1.expects[0].called.should.equal false 
+
+    #             thing.function1()
+    #             thing.function1()
+    #             thing.function1()
+
+    #             functions.function1.expects[0].count.should.equal 3
+    #             functions.function1.expects[0].called.should.equal true
+
+    #             done()
 
 
 
-        it 'removes all active function expectations', ipso (facto) -> 
+    #     it 'removes all active function expectations', ipso (facto) -> 
 
-            instance = does()
-            instance.spectate( name: 'Thing', new class Thing
+    #         instance = does()
+    #         instance.spectate( name: 'Thing', new class Thing
 
-                function1: -> ### original ###
+    #             function1: -> ### original ###
 
-            ).then (thing) => 
+    #         ).then (thing) => 
 
-                instance.activate @testActivation
+    #             instance.activate @testActivation
 
-                thing.does 
-                    function1: -> 
+    #             thing.does 
+    #                 function1: -> 
 
-                {functions} = does._test().spectacles[1]
+    #             {functions} = does._test().spectacles[1]
                 
-                should.exist functions.function1
-                does._test().flush().then -> 
+    #             should.exist functions.function1
+    #             does._test().flush().then -> 
 
-                    should.not.exist functions.function1
-                    facto()
+    #                 should.not.exist functions.function1
+    #                 facto()
 
 
 
-        it 'unstubs prototype expectations'
+    #     it 'unstubs prototype expectations'
 
 
     it 'defines assert() to assert all active expectations', (done) -> 
