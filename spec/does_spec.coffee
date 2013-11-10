@@ -84,25 +84,28 @@ describe 'does', ->
                 done()
 
 
-        xit 'returns existing spectation record if already spectating the object', ipso (done) -> 
+        it 'returns existing spectation record if already spectating the object', ipso (done) -> 
 
             thing = new class Thing
 
             instance = does()
             instance.spectate( name: 'Thing', thing )
 
-            .then (thing) -> 
+            .then (thing) => 
+
+                instance.activate @testActivation
 
                 thing.does.uuid.should.equal 1
-                instance.spectate( name: 'Thing2', thing )
-                                            #
-                                            # name will remain 'Thing' (?for now)
-                                            # 
+                instance.spectate( name: 'Thing', thing )
 
-            .then (thing) -> 
+            .then (thing) => 
 
                 thing.does.uuid.should.equal 1
                 done()
+
+        it 'rejcts on attempt to rename a spectated object', ipso (done) ->
+
+
 
     it 'defines spectateSync() to anoint something with spectatability synchronously', (done) -> 
 
@@ -124,7 +127,10 @@ describe 'does', ->
 
         it 'is chainable', ipso (done) -> 
 
-            spectatable = does().spectateSync
+            instance = does()
+            instance.activate @testActivation
+
+            spectatable = instance.spectateSync
                
                 name: 'Thing'
                 class Thing

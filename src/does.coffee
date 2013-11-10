@@ -282,30 +282,27 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
             # resolve with exiting object if already spectating
             # -------------------------------------------------
             # 
-            # * TODO: each new spec creates a new spectation, 
-            #   uuid of tagged objects may need to follow along
+            
+            if uuid = getUuid( object )
 
-            # if uuid = getUuid( object )
+                if existing = local.spectacles[uuid]
 
-            #     #
-            #     # * got a uuid assigned, will only still be present if created
-            #     #   by an ancestor context
-            #     #
+                    # if opts.tagged  # or existing.tagged
+                    #                 #
+                    #                 # incase of going back to new spectacle per test
+                    #                 #
+                    #     existing.tagged = true
+                    #     local.tagged[name] = object: existing
+                    #                 #
+                    #                 #
+                    #                 #
+                    #     # return action.resolve object
 
-            #     if existing = local.spectacles[uuid]
+                    console.log EXISTING: uuid
 
-            #         if opts.tagged  # or existing.tagged
-            #                         #
-            #                         # incase of going back to new spectacle per test
-            #                         #
-            #             existing.tagged = true
-            #             local.tagged[name] = object: existing
-            #                         #
-            #                         #
-            #                         #
-            #             # return action.resolve object
+                    return action.resolve object
 
-            #         return action.resolve object
+
 
 
             #
@@ -318,6 +315,8 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
 
             do (uuid = ++seq) ->
+
+                console.log NEW: uuid
 
                 local.spectacles[uuid] = spectated = 
 
