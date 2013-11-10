@@ -819,7 +819,7 @@ describe 'does', ->
 
         context 'reset()', -> 
 
-            it 'is tested in ipso - the setup involves mocking multiple entire mocha suite stack - too conplex', ->
+            it 'is tested in ipso - the setup involves mocking multiple entire mocha suite stacks - too conplex', ->
 
 
 
