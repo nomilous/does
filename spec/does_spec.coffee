@@ -128,8 +128,6 @@ describe 'does', ->
             )
 
 
-
-
     it 'defines spectateSync() to anoint something with spectatability synchronously', (done) -> 
 
         does().spectateSync.should.be.an.instanceof Function
@@ -770,44 +768,29 @@ describe 'does', ->
 
                 )
 
-
-
-
-        xit '?REMOVE? tags all spectated objects as inactive (finished)', ipso (done) -> 
+        it 'calls reset() to clear stubs and expectation ahead of next test setup', (done) -> 
 
             thing = new class Thing
             instance = does()
-            instance.spectate( name: 'Thing', thing ).then (thing) -> 
 
-                instance.activate 
-                    spec: 
-                        type: 'test'
-                        timer: {}
+            does._test().reset = -> done()
 
-                thing.does fn: ->
-                thing.fn()
-                thing.does.active.should.equal true
+            instance.spectate( name: 'Thing', thing ).then (thing) =>
+
+                instance.activate @testActivation
+                instance.assert()
 
 
-                instance.assert(->).then -> 
+        context 'reset()', -> 
 
-                    thing.does.active.should.equal false
-                    done()
+            it 'does not clear stubs created by ancestral beforeAll hooks'
+
+            it 'does clear stubs created non ancestral beforeAll hooks'
+
+            it 'clears all stubs created by beforeEach hooks'
 
 
-        xit 'asserts all expectations', ipso (done) -> 
 
-            thing = new class Thing
 
-                function1: -> ### original unfction1 ###
-                function2: -> ### original unfction2 ###
 
-            instance = does()
-            instance.spectate( name: 'Thing', thing ).then (thing) -> 
-
-                thing.does function1: ->
-
-                instance.assert().then -> console.log arguments
-
-        xit 'restores original functions'
 

@@ -292,10 +292,9 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                         return action.reject new Error "does cannot rename '#{existing.name}' to '#{name}'"
 
                     if opts.tagged
-                        
+
                         existing.tagged = true
                         local.tagged[name] = object: existing
-
 
                     console.log EXISTING: uuid
 
@@ -484,6 +483,21 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
 
         #
+        # `resetFn()` - Removes stubs and and expectations
+        # ------------------------------------------------
+        # 
+        # * Called after each test to clear all stubs and remove expectations
+        # * Does not remove stubs created by ancestor before[All] hooks
+        # * All stubs and expectations will be reassembled by the sequence of 
+        #   beforeEach hooks that preceed the next test.
+        #
+
+        reset: deferred (action) ->
+
+            action.resolve()
+
+
+        #
         # `expectFn()` - Sets an expectation on the object at uuid
         # --------------------------------------------------------
         # 
@@ -497,6 +511,15 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
             #
             # keep original functions and replace on object
             #
+
+            console.log TODO: 'ONLY create function expectations in beforeEach and test'
+            
+            console.log TODO: """
+
+            create mocks as tagged so that a stub created in a beforAll hook can return a
+            mock whose tag can be used to inject into a beforeEach hook for expection assembly
+
+            """
 
             # # {object, functions, properties} = local.spectacles[uuid]
             expectation = local.spectacles[uuid]
@@ -615,7 +638,6 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
             spec = local.runtime.current.spec
             return action.resolve() unless spec.type is 'test'
 
-
             if typeof done is 'function'
 
                 expected = {}
@@ -659,7 +681,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
             # local.flush().then -> action.resolve()
 
-            action.resolve()
+            local.reset().then -> action.resolve()
 
 
 
