@@ -282,21 +282,20 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
             # resolve with exiting object if already spectating
             # -------------------------------------------------
             # 
-            
+
             if uuid = getUuid( object )
 
                 if existing = local.spectacles[uuid]
 
-                    # if opts.tagged  # or existing.tagged
-                    #                 #
-                    #                 # incase of going back to new spectacle per test
-                    #                 #
-                    #     existing.tagged = true
-                    #     local.tagged[name] = object: existing
-                    #                 #
-                    #                 #
-                    #                 #
-                    #     # return action.resolve object
+                    if existing.name isnt name
+
+                        return action.reject new Error "does cannot rename '#{existing.name}' to '#{name}'"
+
+                    if opts.tagged
+                        
+                        existing.tagged = true
+                        local.tagged[name] = object: existing
+
 
                     console.log EXISTING: uuid
 

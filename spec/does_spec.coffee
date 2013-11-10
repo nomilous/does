@@ -103,7 +103,30 @@ describe 'does', ->
                 thing.does.uuid.should.equal 1
                 done()
 
-        it 'rejcts on attempt to rename a spectated object', ipso (done) ->
+        it 'rejects on attempt to rename a spectated object', ipso (done) ->
+
+            thing = new class Thing
+
+            instance = does()
+            instance.spectate( name: 'Thing', thing )
+
+            .then (thing) => 
+
+                instance.activate @testActivation
+
+                thing.does.uuid.should.equal 1
+                instance.spectate( name: 'AnotherThing', thing )
+
+            .then( 
+
+                ->
+                (error) ->
+
+                    error.should.match /does cannot rename/
+                    done()
+
+            )
+
 
 
 
@@ -234,7 +257,7 @@ describe 'does', ->
             does._test().runtime.active.should.equal true
             done()
 
-        it 'sets the runtime to active if type is test', ipso (done) -> 
+        it 'sets the runtime to inactive if type isnt test', ipso (done) -> 
 
             spec = 
                 timer: _onTimeout: ->
