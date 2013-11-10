@@ -72,18 +72,6 @@ describe 'does', ->
                 thing.does.uuid.should.equal 1
                 done()
 
-        it 'tags the spectateable as active', (done) -> 
-
-            thing = new class Thing
-            instance = does()
-            instance.spectate( name: 'Thing', thing ).then (thing) => 
-
-                instance.activate @testActivation
-
-                thing.does fn: -> # first call to does activates spectator
-                thing.does.active.should.equal true
-                done()
-
 
         it 'creates the expectations record for the object', ipso (done) -> 
 
@@ -149,7 +137,7 @@ describe 'does', ->
             done()
 
 
-    it 'defines activate() to set runtime context', (done) -> 
+    it 'defines activate() to set runtime context as suite, test or hook', (done) -> 
 
         does().activate.should.be.an.instanceof Function
         done()
@@ -745,7 +733,6 @@ describe 'does', ->
                 instance.activate @hookActivation
 
                 thing.does fn: ->
-                thing.does.active.should.equal true
 
                 instance.assert().then( 
 

@@ -113,6 +113,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
         # -------------------------------------------------
         # 
         # * called from ipso before each test and hook
+        # * removes ALL 
         # * runtime.name contains 'mocha' (detected. the only supported)
         # * runtime.current contains the runtime of currently running test or hook
         # 
@@ -133,8 +134,8 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
             if runtime.spec?
 
                 #
-                # Handle Spec Timeouts
-                # --------------------
+                # Handle Spec and Hook Timeouts
+                # -----------------------------
                 # 
                 # HAC!
                 # 
@@ -508,7 +509,6 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                     fn: object[fnName]
 
             expectation.functionsCount++
-            object[spectator].active = true   # TODO: ?need? 
 
             if expects[0]?
 
@@ -610,8 +610,13 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                                     #       got it in the runtime
                                     #
 
-            # spec = local.runtime.current.spec
-            # return action.resolve() unless spec.type is 'test'
+            #
+            # only proess assert if test (not in hooks)
+            #
+
+            spec = local.runtime.current.spec
+            return action.resolve() unless spec.type is 'test'
+
 
             if typeof done is 'function'
 
