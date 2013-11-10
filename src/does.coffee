@@ -338,47 +338,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
                 if opts.tagged then local.tagged[name] = object: spectated
 
-                
-                #
-                # `object.does()`, object.$does()
-                # -------------------------------
-                #
-
-                object[spectatorName] = (expectations) ->
-
-                    unless local.runtime.active
-                    
-                        console.log 'does:', 'warning: ignored expectation declaration outside of hook or test scope'.yellow
-                        return object
-
-                    #
-                    # expectations as hash of functions to stub
-                    # -----------------------------------------
-                    # 
-                    # `_function` specifies to "pass" to original function (spy)
-                    #
-
-                    for fnName of expectations
-
-                        if fnName.match /^_/
-
-                            fnName = fnName[1..]
-                            spy    = true
-                            fn     = expectations["_#{fnName}"]
-
-                        else
-                            
-                            spy   = false
-                            fn    = expectations[fnName]
-
-                        local.expectFn 
-
-                            uuid:  uuid
-                            fnName: fnName
-                            spy: spy
-                            fn: fn
-
-                    return object # object.does().does() 
+                object[spectatorName] = (expectations) -> local.does uuid, object, expectations
 
                 Object.defineProperty object[spectatorName], 'uuid', get: -> uuid
 
@@ -435,56 +395,61 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
                 if opts.tagged then local.tagged[name] = object: spectated
 
-
-                #
-                # `object.does()`, object.$does()
-                # -------------------------------
-                #
-
-                object[spectatorName] = (expectations) ->
-
-                    unless local.runtime.active
-                    
-                        console.log 'does:', 'warning: ignored expectation declaration outside of hook or test scope'.yellow
-                        return object
-
-                    #
-                    # expectations as hash of functions to stub
-                    # -----------------------------------------
-                    # 
-                    # `_function` specifies to "pass" to original function (spy)
-                    #
-
-                    for fnName of expectations
-
-                        if fnName.match /^_/
-
-                            fnName = fnName[1..]
-                            spy    = true
-                            fn     = expectations["_#{fnName}"]
-
-                        else
-                            
-                            spy   = false
-                            fn    = expectations[fnName]
-
-                        local.expectFn 
-
-                            uuid:  uuid
-                            fnName: fnName
-                            spy: spy
-                            fn: fn
-
-                    return object # object.does().does() 
+                object[spectatorName] = (expectations) -> local.does uuid, object, expectations
 
                 Object.defineProperty object[spectatorName], 'uuid', get: -> uuid
 
                 return object
 
+        #
+        # `does(uuid, object, expectations)` - Creates stubs and associated expectations
+        # ------------------------------------------------------------------------------
+        #
+        # * `object` - the target object
+        # * `expectaations` - a list of functions to expect
+        # 
+
+        does: (uuid, object, expectations) -> 
+                    
+            unless local.runtime.active
+            
+                console.log 'does:', 'warning: ignored expectation declaration outside of hook or test scope'.yellow
+                return object
+
+            #
+            # expectations as hash of functions to stub
+            # -----------------------------------------
+            # 
+            # `_function` specifies to "pass" to original function (spy)
+            #
+
+            for fnName of expectations
+
+                if fnName.match /^_/
+
+                    fnName = fnName[1..]
+                    spy    = true
+                    fn     = expectations["_#{fnName}"]
+
+                else
+                    
+                    spy   = false
+                    fn    = expectations[fnName]
+
+                local.expectFn 
+
+                    uuid:  uuid
+                    fnName: fnName
+                    spy: spy
+                    fn: fn
+
+            return object
+
+
 
         #
-        # `resetFn()` - Removes stubs and and expectations
-        # ------------------------------------------------
+        # `reset()` - Reset stubs and expectations
+        # ----------------------------------------
         # 
         # * Called after each test to clear all stubs and remove expectations
         # * Does not remove stubs created by ancestor before[All] hooks
@@ -494,7 +459,24 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
         reset: deferred (action) ->
 
+
+
+
+            ancestors = local.runtime.ancestors
+            
+            # ancestors.map (a) -> 
+
+            #     console.log suite: a.title
+            #     console.log beforeAll: a._beforeAll
+            #     console.log beforeEach: a._beforeEach
+
             action.resolve()
+
+            #
+            # TODO: if this is the last test in a context there may be 
+            #       stubs created by a peer beforeAll hook that need 
+            #       clearing before the next test
+            #
 
 
         #
@@ -512,14 +494,14 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
             # keep original functions and replace on object
             #
 
-            console.log TODO: 'ONLY create function expectations in beforeEach and test'
+            # console.log TODO: 'ONLY create function expectations in beforeEach and test'
             
-            console.log TODO: """
+            # console.log TODO: """
 
-            create mocks as tagged so that a stub created in a beforAll hook can return a
-            mock whose tag can be used to inject into a beforeEach hook for expection assembly
+            # create mocks as tagged so that a stub created in a beforAll hook can return a
+            # mock whose tag can be used to inject into a beforeEach hook for expection assembly
 
-            """
+            # """
 
             # # {object, functions, properties} = local.spectacles[uuid]
             expectation = local.spectacles[uuid]
