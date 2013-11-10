@@ -339,6 +339,8 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                     spectator:  spectatorName
                     #properties: {}
 
+
+
                 if opts.tagged then local.tagged[name] = object: spectated
 
                 object[spectatorName] = (expectations) -> local.does uuid, object, expectations
@@ -413,7 +415,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
         # 
 
         does: (uuid, object, expectations) -> 
-                    
+
             unless local.runtime.active
             
                 console.log 'does:', 'warning: ignored expectation declaration outside of ipso enabled hook or test scope'.yellow
@@ -424,6 +426,10 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
             #
 
             creator = local.runtime.current.spec
+            if creator.type is 'hook' and not creator.title.match /before/
+
+                console.log 'does:', 'warning: ignored expectation declaration in after hook'.yellow
+                return object
 
             #
             # expectations as hash of functions to stub

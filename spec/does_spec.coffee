@@ -27,15 +27,27 @@ describe 'does', ->
         @testActivation =  
             mode: 'spec'
             spec: 
+                title: 'some title or other'
                 type: 'test'
                 timer: _onTimeout: ->
                 timeout: -> 
             context: 'CONTEXT'
             resolver: ->
 
-        @hookActivation =  
+        @beforeHookActivation =    
             mode: 'spec'
             spec: 
+                title: '"before each" hook'
+                type: 'hook'
+                timer: _onTimeout: ->
+                timeout: -> 
+            context: 'CONTEXT'
+            resolver: ->
+
+        @afterHookActivation =    
+            mode: 'spec'
+            spec: 
+                title: '"after each" hook'
                 type: 'hook'
                 timer: _onTimeout: ->
                 timeout: -> 
@@ -345,7 +357,24 @@ describe 'does', ->
             done()
 
 
-    context 'does()', ->
+    context 'does() in hook', -> 
+
+        it 'creates no stubs or expectations in after hooks', ipso (done) -> 
+
+            thing = new class SomeThing
+            instance = does()
+            instance.spectate( name: 'Thing', thing ).then (thing) =>
+
+                instance.activate @afterHookActivation
+                #instance.activate @beforeHookActivation
+
+                thing.does didNotCreateThisFunction: ->
+
+                should.not.exist thing.didNotCreateThisFunction
+                done()
+
+
+    context 'does() in test', ->
 
         beforeEach (done) -> 
 
@@ -358,10 +387,10 @@ describe 'does', ->
                     ### original unfction2 ###
                     'original2'
 
-
             instance = does()
             instance.spectate 
                 name: 'Thing', thing
+
             .then (@thing) =>
 
                 instance.activate @testActivation
@@ -371,11 +400,11 @@ describe 'does', ->
                     function1: ->  ### stub 1 ###   
                     _function2: -> ### stub 2 ###
 
-
                 uuid = @thing.does.uuid
                 {functionsCount, functions} = does._test().spectacles[uuid]
                 @functions = functions
                 @functionsCount = functionsCount
+
                 done()
 
         it 'increments the functionsCount', ->
@@ -413,7 +442,7 @@ describe 'does', ->
                 @expects1 = @functions.function1.expects[0]
                 @expects2 = @functions.function2.expects[0]
 
-            it 'creator (has reference to the hook or test that created the expectation', -> 
+            it 'creator (has reference to the hook or test that created the expectation)', -> 
 
                 should.exist @expects1.creator
                 should.exist @expects2.creator
@@ -764,7 +793,7 @@ describe 'does', ->
 
             instance.spectate( name: 'Thing', thing ).then (thing) => 
 
-                instance.activate @hookActivation
+                instance.activate @beforeHookActivation
 
                 thing.does fn: ->
 
