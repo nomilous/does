@@ -299,25 +299,10 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                         existing.tagged = true
                         local.tagged[name] = object: existing
 
-                    console.log EXISTING: uuid
-
                     return action.resolve object
 
 
-
-
-            #
-            # TODO: replace this with config.does.create (= (done, opts) -> ) if present
-            #       to enable db/www involvement in per object expectateability creation
-            # 
-            #       already a promise resident (COMPLEXITY: test timeout)
-            #       
-            #
-
-
             do (uuid = ++seq) ->
-
-                console.log NEW: uuid
 
                 local.spectacles[uuid] = spectated = 
 
@@ -468,23 +453,21 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
         # ----------------------------------------
         # 
         # * Called after each test to clear all stubs and remove expectations
-        # * Does not remove stubs created by ancestor before[All] hooks
-        # * All stubs and expectations will be reassembled by the sequence of 
+        # * Does not remove stubs created by ancestor before[All] hooks because they
+        #   will not be recreated ahead of the next test.
+        # * All all other stubs and expectations will be reassembled by the sequence of 
         #   beforeEach hooks that preceed the next test.
         #
 
         reset: deferred (action) ->
 
-
-
-
             ancestors = local.runtime.ancestors
             
-            # ancestors.map (a) -> 
+            beforeAlls = [] 
+            ancestors.map (a) -> beforeAlls.push hook for hook in a._beforeAll
 
-            #     console.log suite: a.title
-            #     console.log beforeAll: a._beforeAll
-            #     console.log beforeEach: a._beforeEach
+            console.log befores: beforeAlls
+
 
             action.resolve()
 
@@ -693,6 +676,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
         # subscribe:  local.subscribe
         # expect:     local.expect
         assert:       local.assert
+        reset:        local.reset
         get:          local.get
         activate:     local.activate
 
