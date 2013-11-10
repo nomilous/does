@@ -466,7 +466,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
             beforeAlls = [] 
             ancestors.map (a) -> beforeAlls.push hook for hook in a._beforeAll
 
-            console.log befores: beforeAlls
+            #console.log befores: beforeAlls
 
 
             action.resolve()
