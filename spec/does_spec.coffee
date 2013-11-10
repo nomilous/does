@@ -2,7 +2,7 @@ does   = require '../lib/does'
 ipso   = require 'ipso'
 should = require 'should'
 
-describe 'does', -> 
+describe 'does', ->
 
     it "doesn't discombobulate", (done) -> 
 
@@ -21,6 +21,26 @@ describe 'does', ->
     #     does._test().scaffold.type.should.equal 'mocha'
     #     done()
     #
+
+    before -> 
+
+        @testActivation =  
+            mode: 'spec'
+            spec: 
+                type: 'test'
+                timer: _onTimeout: ->
+                timeout: -> 
+            context: 'CONTEXT'
+            resolver: ->
+
+        @hookActivation =  
+            mode: 'spec'
+            spec: 
+                type: 'hook'
+                timer: _onTimeout: ->
+                timeout: -> 
+            context: 'CONTEXT'
+            resolver: ->
 
 
     it 'stores expectations internally in a hash', (done) -> 
@@ -55,7 +75,10 @@ describe 'does', ->
         it 'tags the spectateable as active', (done) -> 
 
             thing = new class Thing
-            does().spectate( name: 'Thing', thing ).then (thing) -> 
+            instance = does()
+            instance.spectate( name: 'Thing', thing ).then (thing) => 
+
+                instance.activate @testActivation
 
                 thing.does fn: -> # first call to does activates spectator
                 thing.does.active.should.equal true
@@ -233,7 +256,10 @@ describe 'does', ->
         before (done) -> 
 
             thing = new class ClassName
-            does().spectate( name: 'Thing', thing ).then (@thing) => 
+            instance = does()
+            instance.spectate( name: 'Thing', thing ).then (@thing) => 
+
+                instance.activate @testActivation
 
                 uuid = @thing.does.uuid
                 @record = does._test().spectacles[uuid]
@@ -318,9 +344,12 @@ describe 'does', ->
                     'original2'
 
 
-            does().spectate 
+            instance = does()
+            instance.spectate 
                 name: 'Thing', thing
             .then (@thing) =>
+
+                instance.activate @testActivation
 
                 thing.does
 
@@ -434,12 +463,14 @@ describe 'does', ->
 
             it 'stub calls the mocker', ipso (facto) -> 
 
-                does().spectate
+                instance = does()
+                instance.spectate
                     name: 'TypeOfThing'
                     new class TypeOfThing
 
-                .then (thing) -> 
+                .then (thing) => 
 
+                    instance.activate @testActivation
                     thing.does 
                         coolStuff: -> facto
                             todo: 
@@ -452,15 +483,17 @@ describe 'does', ->
 
             it 'spy calls the mocker and the original function', ipso (facto) -> 
 
-                does().spectate
+                instance = does()
+                instance.spectate
                     name: 'TypeOfThing'
                     new class TypeOfThing
 
                         constructor: (@property = 1) -> 
                         coolStuff: -> @property += 2
 
-                .then (thing) -> 
+                .then (thing) => 
 
+                    instance.activate @testActivation
                     thing.does
 
                         #
@@ -478,17 +511,18 @@ describe 'does', ->
 
         it 'works just like does does', ipso (facto) -> 
 
-            does().spectate
+            instance = does()
+            instance.spectate
                 name: 'TypeOfThing'
                 new class TypeOfThing
 
                     constructor: (@property = 1) -> 
-                    does: ->
+                    does: ->  # alreadt defines does
                     coolStuff: -> @property += 2
 
 
-            .then (thing) -> 
-
+            .then (thing) => 
+                instance.activate @testActivation
                 thing.$does _coolStuff: -> @property = 9998
                 thing.coolStuff()
                 thing.property.should.equal 10000
@@ -577,11 +611,14 @@ describe 'does', ->
         it 'removes stubbed functions from untagged spectated objects', ipso (facto) -> 
 
 
-            does().spectate
+            instance = does()
+            instance.spectate
                 name: 'Thing', new class Thing
                     function1: -> ### original ###
 
-            .then (thing) -> 
+            .then (thing) => 
+
+                instance.activate @testActivation
                 thing.does 
                     function1: -> 
                     functionThatDoesNotExist: ->
@@ -598,13 +635,16 @@ describe 'does', ->
 
         it 'does not remove stubbed functions from tagged spectated objects', ipso (done) ->
 
-            does().spectate
+            instance = does()
+            instance.spectate
                 name: 'Thing'
                 tagged: true
                 new class Thing
                     function1: -> ### original ###
 
-            .then (thing) -> 
+            .then (thing) => 
+
+                instance.activate @testActivation
                 thing.does 
                     function1: -> 
                     functionThatDoesNotExist: ->
@@ -621,13 +661,16 @@ describe 'does', ->
 
         it 'resets the expects on tagged spectated object functions', ipso (done) ->
 
-            does().spectate
+            instance = does()
+            instance.spectate
                 name: 'Thing'
                 tagged: true
                 new class Thing
                     function1: -> ### original ###
 
-            .then (thing) -> 
+            .then (thing) => 
+
+                instance.activate @testActivation
                 thing.does 
                     function1: -> 
                     functionThatDoesNotExist: ->
@@ -660,11 +703,14 @@ describe 'does', ->
 
         it 'removes all active function expectations', ipso (facto) -> 
 
-            does().spectate( name: 'Thing', new class Thing
+            instance = does()
+            instance.spectate( name: 'Thing', new class Thing
 
                 function1: -> ### original ###
 
-            ).then (thing) -> 
+            ).then (thing) => 
+
+                instance.activate @testActivation
 
                 thing.does 
                     function1: -> 
@@ -695,12 +741,9 @@ describe 'does', ->
             thing = new class Thing
             instance = does()
 
-            instance.spectate( name: 'Thing', thing ).then (thing) -> 
+            instance.spectate( name: 'Thing', thing ).then (thing) => 
 
-                instance.activate 
-                    spec: 
-                        type: 'hook'
-                        timer: {}
+                instance.activate @hookActivation
 
                 thing.does fn: ->
                 thing.does.active.should.equal true

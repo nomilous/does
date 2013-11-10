@@ -1,5 +1,6 @@
 {deferred} = require 'also'
 should     = require 'should'
+colors     = require 'colors'
 
 #
 # does() - Creates "spectateability"
@@ -121,7 +122,8 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
         #       * current.resolver - is the hook or test resolver (`done` function)
         # 
 
-        runtime: {}
+        runtime: 
+            active: false   # .does() only accessable if active (in "hooks"()'s and it()'s)
 
         activate: (runtime) -> 
 
@@ -216,6 +218,10 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
                     ancestors.unshift parent
                     parent = parent.parent
+
+            else if (try runtime.spec.type is 'hook')
+
+                local.runtime.active = true
 
             else
 
@@ -336,10 +342,16 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
                 
                 #
-                # object.does.count(N, expectations)
-                # TODO: object.does pushed into per function sequence (array)
-                #       when called resets the mock wrapper to next in sequence
+                # `object.does()`, object.$does()
+                # -------------------------------
+                #
+
                 object[spectatorName] = (expectations) ->
+
+                    unless local.runtime.active
+                    
+                        console.log 'does:', 'warning: ignored expectation declaration outside of hook or test scope'.yellow
+                        return object
 
                     #
                     # expectations as hash of functions to stub
@@ -425,12 +437,18 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
                 if opts.tagged then local.tagged[name] = object: spectated
 
-                
+
                 #
-                # object.does.count(N, expectations)
-                # TODO: object.does pushed into per function sequence (array)
-                #       when called resets the mock wrapper to next in sequence
+                # `object.does()`, object.$does()
+                # -------------------------------
+                #
+
                 object[spectatorName] = (expectations) ->
+
+                    unless local.runtime.active
+                    
+                        console.log 'does:', 'warning: ignored expectation declaration outside of hook or test scope'.yellow
+                        return object
 
                     #
                     # expectations as hash of functions to stub
@@ -490,7 +508,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                     fn: object[fnName]
 
             expectation.functionsCount++
-            object[spectator].active = true
+            object[spectator].active = true   # TODO: ?need? 
 
             if expects[0]?
 
