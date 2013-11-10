@@ -413,6 +413,13 @@ describe 'does', ->
                 @expects1 = @functions.function1.expects[0]
                 @expects2 = @functions.function2.expects[0]
 
+            it 'creator (has reference to the hook or test that created the expectation', -> 
+
+                should.exist @expects1.creator
+                should.exist @expects2.creator
+                @expects1.creator.should.equal @testActivation.spec
+                @expects2.creator.should.equal @testActivation.spec
+
 
             it 'called (has the function been called?)', -> 
 

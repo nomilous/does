@@ -209,6 +209,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
             if (try runtime.spec.type is 'test')
 
+                #console.log 'activate 0'
                 local.runtime.active = true
 
                 ancestors = local.runtime.ancestors ||= []
@@ -222,10 +223,12 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
             else if (try runtime.spec.type is 'hook')
 
+                #console.log 'activate 1'
                 local.runtime.active = true
 
             else
 
+                #console.log 'deactivate'
                 local.runtime.active = false
 
 
@@ -413,8 +416,14 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                     
             unless local.runtime.active
             
-                console.log 'does:', 'warning: ignored expectation declaration outside of hook or test scope'.yellow
+                console.log 'does:', 'warning: ignored expectation declaration outside of ipso enabled hook or test scope'.yellow
                 return object
+
+            #
+            # * creator as the currently active mocha hook or test 
+            #
+
+            creator = local.runtime.current.spec
 
             #
             # expectations as hash of functions to stub
@@ -438,7 +447,8 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
                 local.expectFn 
 
-                    uuid:  uuid
+                    creator: creator
+                    uuid: uuid
                     fnName: fnName
                     spy: spy
                     fn: fn
@@ -488,7 +498,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
         #          * keep in mind tagged - do not flush
         # 
 
-        expectFn: ({uuid, fnName, fn, spy}) -> 
+        expectFn: ({creator, uuid, fnName, fn, spy}) -> 
 
             #
             # keep original functions and replace on object
@@ -540,6 +550,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
             expects[0] = expect = 
 
+                creator: creator
                 called: false
                 count:  0
                 #break: false
