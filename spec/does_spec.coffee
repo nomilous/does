@@ -204,6 +204,29 @@ describe 'does', ->
             done()
 
 
+        it 'sets the runtime to active if type is test', ipso (done) -> 
+
+            spec = 
+                type: 'test'
+                timer: _onTimeout: ->
+                parent: 
+                    title: ''
+
+            instance = does()
+            instance.activate mode: 'spec', spec: spec, context: 'CONTEXT', resolver: ->
+            does._test().runtime.active.should.equal true
+            done()
+
+        it 'sets the runtime to active if type is test', ipso (done) -> 
+
+            spec = 
+                timer: _onTimeout: ->
+
+            instance = does()
+            instance.activate mode: 'spec', spec: spec, context: 'CONTEXT', resolver: ->
+            does._test().runtime.active.should.equal false
+            done()
+
 
     context 'expectation records contains', -> 
 

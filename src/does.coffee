@@ -206,6 +206,8 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
             if (try runtime.spec.type is 'test')
 
+                local.runtime.active = true
+
                 ancestors = local.runtime.ancestors ||= []
                 ancestors.length = 0
 
@@ -215,7 +217,9 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                     ancestors.unshift parent
                     parent = parent.parent
 
-                console.log 'TEST @', ancestors.map( (p) -> p.title ).join ' ~ '
+            else
+
+                local.runtime.active = false
 
 
 
