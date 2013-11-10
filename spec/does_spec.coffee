@@ -121,7 +121,7 @@ describe 'does', ->
             next = spectatable.does 
                 function1: ->
                 function2: ->
-                    
+
             next.should.equal spectatable
             done()
 
@@ -181,7 +181,27 @@ describe 'does', ->
 
             internal.runtime.current.spec.timer._onTimeout()
 
+        it 'populates the ancestor stack', ipso (done) -> 
 
+            spec = 
+                type: 'test'
+                timer: _onTimeout: ->
+                parent: 
+                    title: 'inner context'
+                    parent: 
+                        title: 'outer context'
+                        parent: 
+                            title: 'describe'
+                            parent:
+                                title: ''   # blank at the root, 
+                                            # dunno. suspect for OUTER hooks
+            instance = does()
+            instance.activate mode: 'spec', spec: spec, context: 'CONTEXT', resolver: ->
+
+            ancestors = does._test().runtime.ancestors
+            titles = ancestors.map (a) -> a.title
+            titles.should.eql [ '', 'describe', 'outer context', 'inner context' ]
+            done()
 
 
 

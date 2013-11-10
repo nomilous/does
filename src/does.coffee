@@ -131,6 +131,9 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
             if runtime.spec?
 
                 #
+                # Handle Spec Timeouts
+                # --------------------
+                # 
                 # HAC!
                 # 
                 # * do not want to see test timeouts when test resolve was not
@@ -191,6 +194,28 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
                     original.call runtime.context, ms
                     tapTimeout()
+
+
+            #
+            # Refresh the ancestor stack
+            # --------------------------
+            # 
+            # * The injection filter reset() removes all spectations and stubs that 
+            #   were not created by an ancestor hook.
+            #
+
+            if (try runtime.spec.type is 'test')
+
+                ancestors = local.runtime.ancestors ||= []
+                ancestors.length = 0
+
+                parent = runtime.spec.parent
+                while parent? 
+
+                    ancestors.unshift parent
+                    parent = parent.parent
+
+                console.log 'TEST @', ancestors.map( (p) -> p.title ).join ' ~ '
 
 
 
