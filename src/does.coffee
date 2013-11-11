@@ -505,6 +505,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                     # * if it IS an expectation then it shoud be removed (it was set in a beforeEach hook)
                     # * it will be set again ahead of the next test if the beforeEach is still an ancestor
                     # * need history?
+                    # * random link: http://www.youtube.com/watch?v=TOofSOg35Xc
                     # 
 
                     if original.fn? then object[functionName] = original.fn
