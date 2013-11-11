@@ -222,18 +222,28 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                 #console.log 'activate 0'
                 local.runtime.active = true
 
+                # #
+                # # EXPENSIVE - remove stups created by beforeAll hooks that are no longer ancestors
+                # # --------------------------------------------------------------------------------
+                # # 
+                # # * also keeps runtime.ancestors (maybe usefull)
+                # # 
+
+                # beforeAlls = [] 
                 ancestors = local.runtime.ancestors ||= []
                 ancestors.length = 0
-
                 parent = runtime.spec.parent
                 while parent? 
-
+                    # beforeAlls.push hook for hook in parent._beforeAll
                     ancestors.unshift parent
                     parent = parent.parent
 
-
-                console.log holding: local.runtime.holding
-
+                # local.runtime.holding.map ({expects, functionName, object}) ->
+                #     return if beforeAlls.indexOf( expects[0].creator ) >= 0
+                #     console.log DO_UNSTUB: functionName
+                #     #
+                #     # necessary? 
+                #     #
 
 
             else if (try runtime.spec.type is 'hook')
@@ -528,7 +538,6 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
                         holding.push
 
-                            creator: creator
                             expects: expects   
                             functionName: functionName
                             object: object
@@ -575,7 +584,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
             # # {object, functions, properties} = local.entities[uuid]
             entity = local.entities[uuid]
-            {object, type, tagged, spectator, functions} = entity
+            {object, name, type, tagged, spectator, functions} = entity
             {expects, original} = functions[fnName] ||= 
                 expects: []
                 original: 
@@ -593,8 +602,10 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
             if expects[0]? and expects[0].active
 
-                throw new Error "does doesn't currently support sequenced expectations - already stubbed #{type}.#{fnName}()"
-                return
+                if not (creator.type is 'hook' and creator.title.match /before all/)
+
+                    throw new Error "does doesn't currently support sequenced expectations - already stubbed [#{type}: #{name}].#{fnName}()"
+                    return
 
 
             if expectation
