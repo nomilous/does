@@ -867,8 +867,39 @@ describe 'does', ->
 
         context 'reset()', -> 
 
-            it 'is tested in ipso - the setup involves mocking multiple entire mocha suite stacks - too conplex', ->
+            it 'removes expectations (created in beforeEach) and leaves stubs (created in beforeAll hooks)', (done) -> 
 
+                thing = new class Thing
+                    fnOriginal: -> ### original ###
+
+                instance = does()
+
+                instance.spectate( name: 'Thing', thing ).then (thing) =>
+
+                    instance.activate @beforeEachHookActivation
+                    thing.does 
+                        fnFromBeforeEach: ->
+                        fnOriginal: -> 
+
+                    instance.activate @beforeAllHookActivation
+                    thing.does fnFromBeforeAll: ->
+
+                    should.exist thing.fnFromBeforeEach
+                    should.exist thing.fnOriginal
+                    thing.fnOriginal.toString().should.not.match /original/
+                    should.exist thing.fnFromBeforeAll
+
+                    instance.reset().then ->
+
+                        should.exist thing.fnFromBeforeAll
+                        should.exist thing.fnOriginal
+                        thing.fnOriginal.toString().should.match /original/
+                        done()
+
+
+                .then (->), done
+
+            
 
 
 

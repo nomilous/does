@@ -477,7 +477,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
             for uuid of entities
 
-                {name, object, functions} = entities[uuid]
+                {name, object, functionsCount, functions} = entities[uuid]
                 for functionName of functions
 
                     {expects, original} = functions[functionName]
@@ -504,10 +504,13 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                     #
                     # * if it IS an expectation then it shoud be removed (it was set in a beforeEach hook)
                     # * it will be set again ahead of the next test if the beforeEach is still an ancestor
+                    # * need history?
                     # 
 
-                    console.log CLEAR: "#{name}.#{functionName}"
-                    # TODO reset functionsCount'
+                    if original.fn? then object[functionName] = original.fn
+                    else delete object[functionName]
+                    delete functions[functionName]
+                    entities[uuid].functionsCount = --functionsCount
 
 
             action.resolve()
@@ -535,15 +538,6 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
             #
             # keep original functions and replace on entity
             #
-
-            # console.log TODO: 'ONLY create function expectations in beforeEach and test'
-            
-            # console.log TODO: """
-
-            # create mocks as tagged so that a stub created in a beforAll hook can return a
-            # mock whose tag can be used to inject into a beforeEach hook for expection assembly
-
-            # """
 
             # # {object, functions, properties} = local.entities[uuid]
             entity = local.entities[uuid]
