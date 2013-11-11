@@ -461,6 +461,10 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
         #   will not be recreated ahead of the next test.
         # * All all other stubs and expectations will be reassembled by the sequence of 
         #   beforeEach hooks that preceed the next test.
+        # 
+        # TODO: this is called after each test by way of wrapping the test resolver 
+        #       in ipso, it might more sonsible be inserted into a beforeAll at the 
+        #       root of the suite tree
         #
 
         reset: deferred (action) ->
@@ -560,7 +564,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
             if expects[0]?
 
-                console.log "does doesn't currently support multiple expectations - already spectating #{type}.#{fnName}()"
+                throw new Error "does doesn't currently support sequenced expectations - already stubbed #{type}.#{fnName}()"
                 return
 
 
