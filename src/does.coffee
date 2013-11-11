@@ -127,9 +127,14 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
         #       * current.context  - is the hook or test context
         #       * current.resolver - is the hook or test resolver (`done` function)
         # 
+        # * runtime.holding - array contains function stubs created by beforeAll hooks
+        #                     the may need to be removed ahead of the "next" test if
+        #                     the hook is no longer an ancestor.
+        # 
 
         runtime: 
             active: false   # .does() only accessable if active (in "hooks"()'s and it()'s)
+            holding: []
 
         activate: (runtime) -> 
 
@@ -225,6 +230,11 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
                     ancestors.unshift parent
                     parent = parent.parent
+
+
+                console.log holding: local.runtime.holding
+
+
 
             else if (try runtime.spec.type is 'hook')
 
@@ -480,6 +490,10 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
             # beforeAlls = [] 
             # ancestors.map (a) -> beforeAlls.push hook for hook in a._beforeAll
 
+
+            local.runtime.holding.length = 0   # flush
+            holding = local.runtime.holding
+
             for uuid of entities
 
                 {name, object, functionsCount, functions} = entities[uuid]
@@ -496,7 +510,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                     #          running of the next popped() mock (later, if ever, it's complicated)  
                     #
 
-                    {expectation} = expects[0]
+                    {expectation, creator} = expects[0]
 
                     # 
                     # * if not an expectation the leave is alone, it's a passive stub set up in a beforeAll 
@@ -504,7 +518,23 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                     #   expectations( note that some of these entities being reset here are **those mocks**)
                     # 
 
-                    continue unless expectation
+                    unless expectation
+
+                        #
+                        # * place stubs into holding - because the beforeAll that created them
+                        #   might not **still be** an ancestor of the next test, at which point
+                        #   the stub need to be removed (unknown at this time)
+                        #
+
+                        holding.push
+
+                            creator: creator
+                            expects: expects   
+                            functionName: functionName
+                            object: object
+
+
+                        continue
 
                     #
                     # * if it IS an expectation then it shoud be removed (it was set in a beforeEach hook)
@@ -526,14 +556,6 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
 
             action.resolve()
-
-            console.log TODO: 'dangling beforeAll may still be preset'
-
-            #
-            # TODO: if this is the last test in a context there may be 
-            #       stubs created by a peer beforeAll hook that need 
-            #       clearing before the next test
-            #
 
 
         #
