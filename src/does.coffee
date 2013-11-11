@@ -39,13 +39,15 @@ Storage Structure
 
 ```
 
-entities/:uuid:/createdAt   # * Timestamp
-entities/:uuid:/timeout     # * ((hopefully)) Timeout of the parent mocha test.
-entities/:uuid:/object      # * Reference to object
-entities/:uuid:/type        # * Constructor name (if present) ##undecided
-entities/:uuid:/tagged      # * Is a special case spectacle
-entities/:uuid:/functions   # * List of function expectations
-entities/:uuid:/spectator   # * Spectator function name (does or $does)
+entities/:uuid:/uuid           # * Yip
+entities/:uuid:/createdAt      # * Timestamp
+entities/:uuid:/object         # * Reference to object
+entities/:uuid:/name           # * Name
+entities/:uuid:/type           # * Constructor name (if present) ##undecided
+entities/:uuid:/tagged         # * Is a special case entity
+entities/:uuid:/functionsCount # * How many function stubs / expectation are present
+entities/:uuid:/functions      # * List of function expectations
+entities/:uuid:/spectator      # * Spectator function name (does or $does)
 
 entities/:uuid:/functions/fnName/original       # * Container for the original function
 entities/:uuid:/functions/fnName/original/fn    # * Reference to the original function
@@ -58,12 +60,14 @@ entities/:uuid:/functions/fnName/expects    # * Array of mock function container
   one mock to be set up in a sequece
 
 ```
-entities/:uuid:/functions/fnName/expects/0/called     # * Boolean - was it called
-entities/:uuid:/functions/fnName/expects/0/count      # * (temporary) - count of calls
-entities/:uuid:/functions/fnName/expects/0/break      # * (later) - sets a breakpoint - COMPLEXITIES: test timeouts, runs respawn new process
-entities/:uuid:/functions/fnName/expects/0/stub       # * The stub function (wrapper)
-entities/:uuid:/functions/fnName/expects/0/spy        # * Boolean - should it call onward to origal function 
-entities/:uuid:/functions/fnName/expects/0/fn         # * The function mocker
+entities/:uuid:/functions/fnName/expects/0/expectation  # * Boolean - reject if not called in test
+entities/:uuid:/functions/fnName/expects/0/creator      # * Ref to creator (test or hook)
+entities/:uuid:/functions/fnName/expects/0/called       # * Boolean - was it called
+entities/:uuid:/functions/fnName/expects/0/count        # * (temporary) - count of calls
+entities/:uuid:/functions/fnName/expects/0/break        # * (later) - sets a breakpoint - COMPLEXITIES: test timeouts, runs respawn new process
+entities/:uuid:/functions/fnName/expects/0/stub         # * The stub function (wrapper)
+entities/:uuid:/functions/fnName/expects/0/spy          # * Boolean - should it call onward to origal function 
+entities/:uuid:/functions/fnName/expects/0/fn           # * The function mocker
 
 ```
 
@@ -461,15 +465,54 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
         reset: deferred (action) ->
 
-            ancestors = local.runtime.ancestors
-            
-            beforeAlls = [] 
-            ancestors.map (a) -> beforeAlls.push hook for hook in a._beforeAll
+            entities = local.entities # needn't be all that local (got promise), and mode
 
-            #console.log befores: beforeAlls
+            #
+            # TODO: still need ancestors?
+            #
+
+            # ancestors = local.runtime.ancestors
+            # beforeAlls = [] 
+            # ancestors.map (a) -> beforeAlls.push hook for hook in a._beforeAll
+
+            for uuid of entities
+
+                {name, object, functions} = entities[uuid]
+                for functionName of functions
+
+                    {expects, original} = functions[functionName]
+
+                    #
+                    # * expects is array of function expectation 
+                    #    * BUT
+                    #        * only the first element is currently used
+                    #        * allows the posibility of setting an expectation sequence 
+                    #          where each call made to the "function" can result in the 
+                    #          running of the next popped() mock (later, if ever, it's complicated)  
+                    #
+
+                    {expectation} = expects[0]
+
+                    # 
+                    # * if not an expectation the leave is alone, it's a passive stub set up in a beforeAll 
+                    #   hook to return tagged mocks for use in "deeper" beforeEach hooks to create tierN 
+                    #   expectations( note that some of these entities being reset here are **those mocks**)
+                    # 
+
+                    continue unless expectation
+
+                    #
+                    # * if it IS an expectation then it shoud be removed (it was set in a beforeEach hook)
+                    # * it will be set again ahead of the next test if the beforeEach is still an ancestor
+                    # 
+
+                    console.log CLEAR: "#{name}.#{functionName}"
+                    # TODO reset functionsCount'
 
 
             action.resolve()
+
+            console.log TODO: 'dangling beforeAll may still be preset'
 
             #
             # TODO: if this is the last test in a context there may be 
