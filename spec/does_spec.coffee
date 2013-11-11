@@ -34,10 +34,20 @@ describe 'does', ->
             context: 'CONTEXT'
             resolver: ->
 
-        @beforeHookActivation =    
+        @beforeEachHookActivation =    
             mode: 'spec'
             spec: 
                 title: '"before each" hook'
+                type: 'hook'
+                timer: _onTimeout: ->
+                timeout: -> 
+            context: 'CONTEXT'
+            resolver: ->
+
+        @beforeAllHookActivation =    
+            mode: 'spec'
+            spec: 
+                title: '"before all" hook'
                 type: 'hook'
                 timer: _onTimeout: ->
                 timeout: -> 
@@ -63,17 +73,28 @@ describe 'does', ->
         # console.log does._test.README
         #
 
-        does._test().spectacles.should.be.an.instanceof Object
+        does._test().entities.should.be.an.instanceof Object
         done()
 
 
-    it 'defines spectate() to anoint something with spectatability', (done) -> 
+    it 'defines spectate() to spectateability to an entity', (done) -> 
 
         does().spectate.should.be.an.instanceof Function
         done()
 
 
     context 'spectate()', -> 
+
+
+        it 'creates the entity record for the object', ipso (done) -> 
+
+            thing = new class Thing
+
+            does().spectate( name: 'Thing', thing ).then (thing) -> 
+
+                uuid = thing.does.uuid
+                should.exist does._test().entities[uuid].object.should.equal thing
+                done()
 
         it 'tags the spectateable with the uuid', (done) -> 
 
@@ -85,18 +106,7 @@ describe 'does', ->
                 done()
 
 
-        it 'creates the expectations record for the object', ipso (done) -> 
-
-            thing = new class Thing
-
-            does().spectate( name: 'Thing', thing ).then (thing) -> 
-
-                uuid = thing.does.uuid
-                should.exist does._test().spectacles[uuid].object.should.equal thing
-                done()
-
-
-        it 'returns existing spectation record if already spectating the object', ipso (done) -> 
+        it 'returns existing entity record if already spectating the object', ipso (done) -> 
 
             thing = new class Thing
 
@@ -115,7 +125,7 @@ describe 'does', ->
                 thing.does.uuid.should.equal 1
                 done()
 
-        it 'rejects on attempt to rename a spectated object', ipso (done) ->
+        it 'rejects on attempt to rename an entity', ipso (done) ->
 
             thing = new class Thing
 
@@ -140,7 +150,7 @@ describe 'does', ->
             )
 
 
-    it 'defines spectateSync() to anoint something with spectatability synchronously', (done) -> 
+    it 'defines spectateSync() to spectateability to an entity', (done) -> 
 
         does().spectateSync.should.be.an.instanceof Function
         done()
@@ -289,7 +299,7 @@ describe 'does', ->
                 instance.activate @testActivation
 
                 uuid = @thing.does.uuid
-                @record = does._test().spectacles[uuid]
+                @record = does._test().entities[uuid]
                 done()
 
         it 'createdAt', -> 
@@ -366,11 +376,42 @@ describe 'does', ->
             instance.spectate( name: 'Thing', thing ).then (thing) =>
 
                 instance.activate @afterHookActivation
-                #instance.activate @beforeHookActivation
+                #instance.activate @beforeEachHookActivation
 
                 thing.does didNotCreateThisFunction: ->
 
                 should.not.exist thing.didNotCreateThisFunction
+                done()
+
+        it 'creates a stub that is not an expectation in before(all) hooks', ipso (done) ->
+
+            thing = new class SomeThing
+            instance = does()
+            instance.spectate( name: 'Thing', thing ).then (thing) =>
+
+                instance.activate @beforeAllHookActivation
+                thing.does notAnExpectation: ->
+
+                thing.notAnExpectation.toString().should.match /STUB/
+                 
+                expectation = does._test().entities[1].functions.notAnExpectation.expects[0].expectation
+                expectation.should.equal false
+                done()
+
+
+        it 'creates a stub that is an expectation in beforeEach hooks', ipso (done) ->
+
+            thing = new class SomeThing
+            instance = does()
+            instance.spectate( name: 'Thing', thing ).then (thing) =>
+
+                instance.activate @beforeEachHookActivation
+                thing.does anExpectation: ->
+
+                thing.anExpectation.toString().should.match /EXPECTATION/
+
+                expectation = does._test().entities[1].functions.anExpectation.expects[0].expectation
+                expectation.should.equal true
                 done()
 
 
@@ -401,7 +442,7 @@ describe 'does', ->
                     _function2: -> ### stub 2 ###
 
                 uuid = @thing.does.uuid
-                {functionsCount, functions} = does._test().spectacles[uuid]
+                {functionsCount, functions} = does._test().entities[uuid]
                 @functions = functions
                 @functionsCount = functionsCount
 
@@ -441,6 +482,13 @@ describe 'does', ->
 
                 @expects1 = @functions.function1.expects[0]
                 @expects2 = @functions.function2.expects[0]
+
+            it 'expectation (true means faulure to call rejects)', -> 
+
+                should.exist @expects1.expectation
+                should.exist @expects2.expectation
+                @expects1.expectation.should.equal true
+                @expects2.expectation.should.equal true
 
             it 'creator (has reference to the hook or test that created the expectation)', -> 
 
@@ -503,8 +551,8 @@ describe 'does', ->
                 @thing.function2()
                 @thing.function2()
 
-                expects1 = does._test().spectacles[1].functions.function1.expects[0]
-                expects2 = does._test().spectacles[1].functions.function2.expects[0]
+                expects1 = does._test().entities[1].functions.function1.expects[0]
+                expects2 = does._test().entities[1].functions.function2.expects[0]
 
                 expects1.called.should.equal true
                 expects2.called.should.equal true
@@ -593,10 +641,10 @@ describe 'does', ->
 
             .then -> 
 
-                does._test().spectacles[1].tagged.should.equal true
+                does._test().entities[1].tagged.should.equal true
                 done()
 
-        it 'stores tagged spectacles', ipso (done) -> 
+        it 'stores tagged entities', ipso (done) -> 
 
             does().spectate
                 
@@ -726,7 +774,7 @@ describe 'does', ->
     #                 functionThatDoesNotExist: ->
 
 
-    #             {functions} = does._test().spectacles[1]
+    #             {functions} = does._test().entities[1]
 
     #             thing.function1()
     #             thing.function1()
@@ -765,7 +813,7 @@ describe 'does', ->
     #             thing.does 
     #                 function1: -> 
 
-    #             {functions} = does._test().spectacles[1]
+    #             {functions} = does._test().entities[1]
                 
     #             should.exist functions.function1
     #             does._test().flush().then -> 
@@ -793,7 +841,7 @@ describe 'does', ->
 
             instance.spectate( name: 'Thing', thing ).then (thing) => 
 
-                instance.activate @beforeHookActivation
+                instance.activate @beforeEachHookActivation
 
                 thing.does fn: ->
 

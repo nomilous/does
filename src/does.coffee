@@ -27,30 +27,30 @@ module.exports  = (config = {}) ->
         # 
         #
 
-        spectacles: {} # ∞
+        entities: {} # ∞
 
         ###
 
 
-`local.spectacles` - Houses currently active spectacles
--------------------------------------------------------
+`local.entities` - Houses spectated entites
+-------------------------------------------
 
 Storage Structure
 
 ```
 
-spectacles/:uuid:/createdAt   # * Timestamp
-spectacles/:uuid:/timeout     # * ((hopefully)) Timeout of the parent mocha test.
-spectacles/:uuid:/object      # * Reference to object
-spectacles/:uuid:/type        # * Constructor name (if present) ##undecided
-spectacles/:uuid:/tagged      # * Is a special case spectacle
-spectacles/:uuid:/functions   # * List of function expectations
-spectacles/:uuid:/spectator   # * Spectator function name (does or $does)
+entities/:uuid:/createdAt   # * Timestamp
+entities/:uuid:/timeout     # * ((hopefully)) Timeout of the parent mocha test.
+entities/:uuid:/object      # * Reference to object
+entities/:uuid:/type        # * Constructor name (if present) ##undecided
+entities/:uuid:/tagged      # * Is a special case spectacle
+entities/:uuid:/functions   # * List of function expectations
+entities/:uuid:/spectator   # * Spectator function name (does or $does)
 
-spectacles/:uuid:/functions/fnName/original       # * Container for the original function
-spectacles/:uuid:/functions/fnName/original/fn    # * Reference to the original function
+entities/:uuid:/functions/fnName/original       # * Container for the original function
+entities/:uuid:/functions/fnName/original/fn    # * Reference to the original function
 
-spectacles/:uuid:/functions/fnName/expects    # * Array of mock function containers
+entities/:uuid:/functions/fnName/expects    # * Array of mock function containers
 ```
 
 * Currently only the first mock in the array is used
@@ -58,12 +58,12 @@ spectacles/:uuid:/functions/fnName/expects    # * Array of mock function contain
   one mock to be set up in a sequece
 
 ```
-spectacles/:uuid:/functions/fnName/expects/0/called     # * Boolean - was it called
-spectacles/:uuid:/functions/fnName/expects/0/count      # * (temporary) - count of calls
-spectacles/:uuid:/functions/fnName/expects/0/break      # * (later) - sets a breakpoint - COMPLEXITIES: test timeouts, runs respawn new process
-spectacles/:uuid:/functions/fnName/expects/0/stub       # * The stub function (wrapper)
-spectacles/:uuid:/functions/fnName/expects/0/spy        # * Boolean - should it call onward to origal function 
-spectacles/:uuid:/functions/fnName/expects/0/fn         # * The function mocker
+entities/:uuid:/functions/fnName/expects/0/called     # * Boolean - was it called
+entities/:uuid:/functions/fnName/expects/0/count      # * (temporary) - count of calls
+entities/:uuid:/functions/fnName/expects/0/break      # * (later) - sets a breakpoint - COMPLEXITIES: test timeouts, runs respawn new process
+entities/:uuid:/functions/fnName/expects/0/stub       # * The stub function (wrapper)
+entities/:uuid:/functions/fnName/expects/0/spy        # * Boolean - should it call onward to origal function 
+entities/:uuid:/functions/fnName/expects/0/fn         # * The function mocker
 
 ```
 
@@ -71,7 +71,7 @@ spectacles/:uuid:/functions/fnName/expects/0/fn         # * The function mocker
 * It calls the mocker as assigned by `object.does fnName: -> 'this fn is the mocker'`
 * It then calls the original if spy is true
 
-spectacles/:uuid:/properties  # later
+entities/:uuid:/properties  # later
 
         ###
 
@@ -80,13 +80,13 @@ spectacles/:uuid:/properties  # later
         ###
 
 
-`local.tagged` - Special case (designer) spectacles
----------------------------------------------------
+`local.tagged` - Special case (designer) entities
+-------------------------------------------------
 
 * for spectated objcts that span the entire run (not flushed at each it)
 * see also ipso.save() https://github.com/nomilous/ipso/commit/d73f6ec3df301201429a69df4d11fc984d5d75d3
 
-tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
+tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
         ###
 
@@ -288,7 +288,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
             if uuid = getUuid( object )
 
-                if existing = local.spectacles[uuid]
+                if existing = local.entities[uuid]
 
                     if existing.name isnt name
 
@@ -304,7 +304,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
             do (uuid = ++seq) ->
 
-                local.spectacles[uuid] = spectated = 
+                local.entities[uuid] = spectated = 
 
                     uuid: uuid
                     createdAt: new Date
@@ -363,7 +363,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
             do (uuid = ++seq) ->
 
-                local.spectacles[uuid] = spectated = 
+                local.entities[uuid] = spectated = 
 
                     uuid: uuid
                     createdAt: new Date
@@ -479,7 +479,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
 
         #
-        # `expectFn()` - Sets an expectation on the object at uuid
+        # `expectFn()` - Sets an expectation on the entity at uuid
         # --------------------------------------------------------
         # 
         # * currently new expectations replace entries in expects[0] 
@@ -490,7 +490,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
         expectFn: ({creator, uuid, fnName, fn, spy}) -> 
 
             #
-            # keep original functions and replace on object
+            # keep original functions and replace on entity
             #
 
             # console.log TODO: 'ONLY create function expectations in beforeEach and test'
@@ -502,15 +502,23 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
 
             # """
 
-            # # {object, functions, properties} = local.spectacles[uuid]
-            expectation = local.spectacles[uuid]
-            {object, type, tagged, spectator, functions} = expectation
+            # # {object, functions, properties} = local.entities[uuid]
+            entity = local.entities[uuid]
+            {object, type, tagged, spectator, functions} = entity
             {expects, original} = functions[fnName] ||= 
                 expects: []
                 original: 
                     fn: object[fnName]
 
-            expectation.functionsCount++
+            #
+            # * only set as function expectation if creator is test or before each
+            #
+
+            expectation = true
+            try if creator.type is 'hook'
+                expectation = false unless creator.title.match /before each/
+
+            entity.functionsCount++
 
             if expects[0]?
 
@@ -518,27 +526,54 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                 return
 
 
-            if spy then object[fnName] = stub = -> 
+            if expectation
 
-                ### STUB (spy) ###
+                if spy then object[fnName] = stub = -> 
 
-                expect.called = true
-                expect.count++
-                expect.fn.apply @, arguments
-                original.fn.apply @, arguments if original.fn?
-                
+                    ### EXPECTATION (spy) ###
+                    ### These are created only in tests or beforeEach hooks ###
 
-            else object[fnName] = stub = -> 
+                    expect.called = true
+                    expect.count++
+                    expect.fn.apply @, arguments
+                    original.fn.apply @, arguments if original.fn?
+                    
 
-                ### STUB (mocker) ###
+                else object[fnName] = stub = -> 
 
-                expect.called = true
-                expect.count++
-                expect.fn.apply @, arguments
+                    ### EXPECTATION (mocker) ###
+                    ### These are created only in tests or beforeEach hooks ###
+
+                    expect.called = true
+                    expect.count++
+                    expect.fn.apply @, arguments
+
+            else
+
+                if spy then object[fnName] = stub = -> 
+
+                    ### STUB (spy) ###
+                    ### These are not created in tests or beforeEach hooks ###
+
+                    expect.called = true
+                    expect.count++
+                    expect.fn.apply @, arguments
+                    original.fn.apply @, arguments if original.fn?
+                    
+
+                else object[fnName] = stub = -> 
+
+                    ### STUB (mocker) ###
+                    ### These are not created in tests or beforeEach hooks ###
+
+                    expect.called = true
+                    expect.count++
+                    expect.fn.apply @, arguments
 
 
             expects[0] = expect = 
 
+                expectation: expectation
                 creator: creator
                 called: false
                 count:  0
@@ -548,11 +583,11 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                 fn: fn
 
         # #
-        # # `flush()` - Remove all stubs and delete active spectacles
-        # # ---------------------------------------------------------
+        # # `flush()` - Remove all stubs and delete active entities
+        # # -------------------------------------------------------
         # # 
         # # TODO: flush removes all spectations not created by an ancestor suite
-        # # * does not delete tagged spectacles
+        # # * does not delete tagged entities
         # # 
 
         # flush: deferred (action) -> 
@@ -563,9 +598,9 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
         #     # TODO: unstub for case of prototypes (future instance methods) 
         #     # 
 
-        #     for uuid of local.spectacles
+        #     for uuid of local.entities
 
-        #         expectation = local.spectacles[uuid]
+        #         expectation = local.entities[uuid]
         #         {object, functions, tagged} = expectation
                 
         #         for fnName of functions
@@ -591,7 +626,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
         #             delete functions[fnName]
 
         #         continue if tagged
-        #         delete local.spectacles[uuid]
+        #         delete local.entities[uuid]
 
 
         #     action.resolve()
@@ -603,7 +638,7 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
         # 
         # * this should be called after each test
         # * it requires mocha's test resolver to "fail tests"
-        # * all untagged stubs and spectacles are flushed
+        # * all untagged stubs and entities are flushed
         #
 
         assert: deferred (action, done = null) -> 
@@ -625,10 +660,10 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                 expected = {}
                 resulted = {}
 
-                for uuid of local.spectacles
+                for uuid of local.entities
 
-                    {object, type, name, spectator, functionsCount, functions} = local.spectacles[uuid]
-
+                    {expectation, object, type, name, spectator, functionsCount, functions} = local.entities[uuid]
+                                        # creator (hook or test also preset here)
                     #
                     # * Use built in JSON diff viewer to show (possibly multiple) 
                     #   unmet function expectations
@@ -644,6 +679,12 @@ tagged/:tag:/object -> spectacles/:uuid: (where tagged is true)
                         {expects, original} = functions[fnName]
                         expect = expects[0]
                         call = "#{type}.#{fnName}()"
+
+                        unless expect.expectation
+                            expected[name].functions[call] = 'passive stub'
+                            resulted[name].functions[call] = 'passive stub'
+                            continue
+
                         expected[name].functions[call] = 'was called'
                         if expect.called
                             resulted[name].functions[call] = 'was called'
