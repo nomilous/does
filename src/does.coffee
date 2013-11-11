@@ -61,6 +61,7 @@ entities/:uuid:/functions/fnName/expects    # * Array of mock function container
 
 ```
 entities/:uuid:/functions/fnName/expects/0/expectation  # * Boolean - reject if not called in test
+entities/:uuid:/functions/fnName/expects/0/active       # * Boolean - true if the expectation is active
 entities/:uuid:/functions/fnName/expects/0/creator      # * Ref to creator (test or hook)
 entities/:uuid:/functions/fnName/expects/0/called       # * Boolean - was it called
 entities/:uuid:/functions/fnName/expects/0/count        # * (temporary) - count of calls
@@ -514,7 +515,13 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
                     if original.fn? then object[functionName] = original.fn
                     else delete object[functionName]
-                    delete functions[functionName]
+
+                    #
+                    # * keep the function listing $ipso.save(), but set to inactive
+                    #
+
+                    # delete functions[functionName]
+                    expects[0].active = false
                     entities[uuid].functionsCount = --functionsCount
 
 
@@ -562,7 +569,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
             entity.functionsCount++
 
-            if expects[0]?
+            if expects[0]? and expects[0].active
 
                 throw new Error "does doesn't currently support sequenced expectations - already stubbed #{type}.#{fnName}()"
                 return
@@ -616,6 +623,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
             expects[0] = expect = 
 
                 expectation: expectation
+                active: true
                 creator: creator
                 called: false
                 count:  0
@@ -726,6 +734,8 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                             expected[name].functions[call] = 'passive stub'
                             resulted[name].functions[call] = 'passive stub'
                             continue
+
+                        continue unless expect.active
 
                         expected[name].functions[call] = 'was called'
                         if expect.called

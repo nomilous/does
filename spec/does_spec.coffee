@@ -894,6 +894,23 @@ describe 'does', ->
                         should.exist thing.fnFromBeforeAll
                         should.exist thing.fnOriginal
                         thing.fnOriginal.toString().should.match /original/
+
+                        #
+                        # expectation listing was kept, but set inactive, for ipso.$save()
+                        #
+
+                        functions = does._test().entities[1].functions
+                        should.exist functions.fnFromBeforeEach
+                        should.exist functions.fnOriginal
+                        functions.fnFromBeforeEach.expects[0].active.should.equal false
+                        functions.fnOriginal.expects[0].active.should.equal false
+
+                        #
+                        # before all still active
+                        #
+
+                        should.exist functions.fnFromBeforeAll
+                        functions.fnFromBeforeAll.expects[0].active.should.equal true
                         done()
 
 
