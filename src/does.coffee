@@ -290,6 +290,12 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                 if object.does? and not object.does.uuid? then '$does'
                 else 'does'
 
+            #
+            # * store injection mocks as tagged to persist throughout spec
+            # * and for $save()ing "draft module source" from "spec stubs"
+            #
+
+            opts.tagged = true if object.$ipso? and object.$ipso.PENDING
 
 
             # #
