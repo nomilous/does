@@ -769,6 +769,10 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                     #   unmet function expectations
                     #
 
+                    count = 0
+                    count++ for fn of functions
+                    continue if count is 0
+
                     expected[name] = functions: {}
                     resulted[name] = functions: {}
 
