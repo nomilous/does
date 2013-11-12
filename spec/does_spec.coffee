@@ -335,11 +335,6 @@ describe 'does', ->
             should.exist @record.tagged
             @record.tagged.should.equal false
 
-        it 'functionsCount', ->
-
-            should.exist @record.functionsCount
-            @record.functionsCount.should.equal 0
-
         it 'functions', ->
 
             should.exist @record.functions
@@ -447,16 +442,10 @@ describe 'does', ->
                     _function2: -> ### stub 2 ###
 
                 uuid = @thing.does.uuid
-                {functionsCount, functions} = does._test().entities[uuid]
+                {functions} = does._test().entities[uuid]
                 @functions = functions
-                @functionsCount = functionsCount
 
                 done()
-
-        it 'increments the functionsCount', ->
-
-           @functionsCount.should.equal 2
-
 
         it 'creates original subrecord', ->
 

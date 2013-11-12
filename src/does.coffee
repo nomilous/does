@@ -45,7 +45,6 @@ entities/:uuid:/object         # * Reference to object
 entities/:uuid:/name           # * Name
 entities/:uuid:/type           # * Constructor name (if present) ##undecided
 entities/:uuid:/tagged         # * Is a special case entity
-entities/:uuid:/functionsCount # * How many function stubs / expectation are present
 entities/:uuid:/functions      # * List of function expectations
 entities/:uuid:/spectator      # * Spectator function name (does or $does)
 
@@ -112,6 +111,22 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
             ) unless local.tagged[name]?
 
             callback null, local.tagged[name].object
+
+
+        getSync: (opts) -> 
+
+            try name = opts.query.tag ##undecided
+
+            throw new Error(
+                "does.get(opts) requires opts.query.tag"
+            ) unless name?
+
+            throw new Error(
+                "does has nothing with tag #{name}"
+            ) unless local.tagged[name]?
+
+            return local.tagged[name].object
+
 
         #
         # `activate(runtime)` - Updates the current runtime
@@ -350,7 +365,6 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
                     name: name
                     tagged: opts.tagged or false
-                    functionsCount: 0
                     functions:  {}
                     spectator:  spectatorName
                     #properties: {}
@@ -391,6 +405,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                 if object.does? and not object.does.uuid? then '$does'
                 else 'does'
 
+            opts.tagged = true if object.$ipso? and object.$ipso.PENDING
 
             do (uuid = ++seq) ->
 
@@ -409,7 +424,6 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
                     name: name
                     tagged: opts.tagged or false
-                    functionsCount: 0
                     functions:  {}
                     spectator:  spectatorName
                     #properties: {}
@@ -512,7 +526,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
             for uuid of entities
 
-                {name, object, functionsCount, functions} = entities[uuid]
+                {name, object, functions} = entities[uuid]
                 for functionName of functions
 
                     {expects, original} = functions[functionName]
@@ -567,7 +581,6 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
                     # delete functions[functionName]
                     expects[0].active = false
-                    entities[uuid].functionsCount = --functionsCount
 
 
             action.resolve()
@@ -603,8 +616,6 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
             expectation = true
             try if creator.type is 'hook'
                 expectation = false unless creator.title.match /before each/
-
-            entity.functionsCount++
 
             if expects[0]? and expects[0].active
 
@@ -751,14 +762,12 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
                 for uuid of local.entities
 
-                    {expectation, object, type, name, spectator, functionsCount, functions} = local.entities[uuid]
+                    {expectation, object, type, name, spectator, functions} = local.entities[uuid]
                                         # creator (hook or test also preset here)
                     #
                     # * Use built in JSON diff viewer to show (possibly multiple) 
                     #   unmet function expectations
                     #
-
-                    continue unless functionsCount > 0
 
                     expected[name] = functions: {}
                     resulted[name] = functions: {}
@@ -782,18 +791,10 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                         else
                             resulted[name].functions[call] = 'was NOT called'
 
-                    # object[spectator].active = false
-
                 try resulted.should.eql expected
                 catch error
                     done error
                     action.reject error
-
-            # #
-            # # TODO: Confirm that there ""ARE"" no known rejection cases for flush()
-            # #       * this will need attention later
-
-            # local.flush().then -> action.resolve()
 
             local.reset().then -> action.resolve()
 
@@ -810,6 +811,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
         assert:       local.assert
         reset:        local.reset
         get:          local.get
+        getSync:      local.getSync
         activate:     local.activate
 
 
