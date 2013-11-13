@@ -634,8 +634,12 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
                     expect.called = true
                     expect.count++
-                    expect.fn.apply @, arguments
-                    original.fn.apply @, arguments if original.fn?
+                    try
+                        expect.fn.apply @, arguments
+                        original.fn.apply @, arguments if original.fn?
+                    catch error
+                        expect.error = error
+                        #throw error
                     
 
                 else object[fnName] = stub = -> 
@@ -645,7 +649,11 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
                     expect.called = true
                     expect.count++
-                    expect.fn.apply @, arguments
+                    try 
+                        expect.fn.apply @, arguments
+                    catch error
+                        expect.error = error
+                        #throw error
 
             else
 
@@ -656,8 +664,13 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
                     expect.called = true
                     expect.count++
-                    expect.fn.apply @, arguments
-                    original.fn.apply @, arguments if original.fn?
+                    try
+                        expect.fn.apply @, arguments
+                        original.fn.apply @, arguments if original.fn?
+                    catch error
+                        expect.error = error
+                        #throw error
+
                     
 
                 else object[fnName] = stub = -> 
@@ -667,7 +680,11 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
                     expect.called = true
                     expect.count++
-                    expect.fn.apply @, arguments
+                    try
+                        expect.fn.apply @, arguments
+                    catch error
+                        expect.error = error
+                        #throw error
 
 
             expects[0] = expect = 
@@ -676,6 +693,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                 active: true
                 creator: creator
                 called: false
+                error: undefined
                 count:  0
                 #break: false
                 stub: stub
@@ -788,6 +806,20 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                             continue
 
                         continue unless expect.active
+
+                        if expect.error? 
+
+                            if expect.error.name is 'AssertionError'
+                                expected[name].functions[call] = 
+                                    AssertionError: 
+                                        'actual/expected': expect.error.expected
+                                resulted[name].functions[call] =
+                                    AssertionError: 
+                                        'actual/expected': expect.error.actual
+                                continue
+
+                            else throw expect.error
+
 
                         expected[name].functions[call] = 'was called'
                         if expect.called

@@ -846,6 +846,46 @@ describe 'does', ->
 
                 )
 
+
+        it 'integrates the AssertionError delta into the function expectation output', ipso (done) -> 
+
+            thing = new class Thing
+            instance = does()
+
+            instance.spectate( name: 'Thing', thing ).then (thing) => 
+
+                instance.activate @testActivation
+
+                thing.does fn: -> {test: 1}.should.eql {test:2}
+                thing.fn()
+
+                instance.assert( -> ).then(
+
+                    ->
+                    (error) -> 
+
+                        error.name.should.equal 'AssertionError'
+                        error.actual.should.eql 
+                            Thing:
+                                functions:
+                                    'Thing.fn()':
+                                        AssertionError:
+                                            'actual/expected':
+                                                test: 1
+                        error.expected.should.eql 
+                            Thing:
+                                functions:
+                                    'Thing.fn()':
+                                        AssertionError:
+                                            'actual/expected':
+                                                test: 2
+                        done()
+
+                )
+
+
+
+
         it 'calls reset() to clear stubs and expectation ahead of next test setup', (done) -> 
 
             thing = new class Thing
