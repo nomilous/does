@@ -820,7 +820,15 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                                         'expected/actual': expect.error.expected
                                 continue
 
-                            else throw expect.error
+                            else 
+
+                                local.reset().then -> 
+
+                                    #
+                                    # PROBLEM HERE: if reset needs to become """actually""" async
+                                    #               
+
+                                throw expect.error
 
 
                         expected[name].functions[call] = 'was called'
