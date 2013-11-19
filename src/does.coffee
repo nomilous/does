@@ -831,8 +831,11 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
                 try resulted.should.eql expected
                 catch error
-                    action.reject error
-                    done error
+
+                    return local.reset().then -> 
+                        action.reject error
+                        done error
+                    
 
             local.reset().then -> action.resolve()
 
