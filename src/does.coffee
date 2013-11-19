@@ -812,10 +812,10 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                             if expect.error.name is 'AssertionError'
                                 expected[name].functions[call] = 
                                     AssertionError: 
-                                        'actual/expected': expect.error.expected
+                                        'expected/actual': expect.error.actual
                                 resulted[name].functions[call] =
                                     AssertionError: 
-                                        'actual/expected': expect.error.actual
+                                        'expected/actual': expect.error.expected
                                 continue
 
                             else throw expect.error

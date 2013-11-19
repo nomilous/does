@@ -870,15 +870,15 @@ describe 'does', ->
                                 functions:
                                     'Thing.fn()':
                                         AssertionError:
-                                            'actual/expected':
-                                                test: 1
+                                            'expected/actual':
+                                                test: 2
                         error.expected.should.eql 
                             Thing:
                                 functions:
                                     'Thing.fn()':
                                         AssertionError:
-                                            'actual/expected':
-                                                test: 2
+                                            'expected/actual':
+                                                test: 1
                         done()
 
                 )
