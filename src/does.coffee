@@ -234,6 +234,8 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
             if (try runtime.spec.type is 'test')
 
+
+                #console.log TEST: local.runtime
                 #console.log 'activate 0'
                 local.runtime.active = true
 
@@ -767,7 +769,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                                     #
 
             #
-            # only proess assert if test (not in hooks)
+            # only process assert if test (not in hooks)
             #
 
             spec = local.runtime.current.spec
@@ -829,8 +831,8 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
                 try resulted.should.eql expected
                 catch error
-                    done error
                     action.reject error
+                    done error
 
             local.reset().then -> action.resolve()
 
