@@ -240,7 +240,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                 local.runtime.active = true
 
                 # #
-                # # EXPENSIVE - remove stups created by beforeAll hooks that are no longer ancestors
+                # # EXPENSIVE - remove stubs created by beforeAll hooks that are no longer ancestors
                 # # --------------------------------------------------------------------------------
                 # # 
                 # # * also keeps runtime.ancestors (maybe usefull)
@@ -260,7 +260,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                     
                     console.log 
 
-                    
+
                         DO_UNSTUB: functionName
 
                     #
