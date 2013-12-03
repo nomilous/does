@@ -246,21 +246,26 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                 # # * also keeps runtime.ancestors (maybe usefull)
                 # # 
 
-                # beforeAlls = [] 
+                beforeAlls = [] 
                 ancestors = local.runtime.ancestors ||= []
                 ancestors.length = 0
                 parent = runtime.spec.parent
                 while parent? 
-                    # beforeAlls.push hook for hook in parent._beforeAll
+                    beforeAlls.push hook for hook in parent._beforeAll
                     ancestors.unshift parent
                     parent = parent.parent
 
-                # local.runtime.holding.map ({expects, functionName, object}) ->
-                #     return if beforeAlls.indexOf( expects[0].creator ) >= 0
-                #     console.log DO_UNSTUB: functionName
-                #     #
-                #     # necessary? 
-                #     #
+                local.runtime.holding.map ({expects, functionName, object}) ->
+                    return if beforeAlls.indexOf( expects[0].creator ) >= 0
+                    
+                    console.log 
+
+                    
+                        DO_UNSTUB: functionName
+
+                    #
+                    # necessary? 
+                    #
 
 
             else if (try runtime.spec.type is 'hook')
