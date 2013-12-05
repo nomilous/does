@@ -7,7 +7,6 @@ colors     = require 'colors'
 # ----------------------------------
 #
 
-
 lastInstance    = undefined
 module.exports  = (config = {}) -> 
 
@@ -255,17 +254,26 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                     ancestors.unshift parent
                     parent = parent.parent
 
-                local.runtime.holding.map ({expects, functionName, object}) ->
+                # local.runtime.holding.map ({expects, functionName, object}) ->
+                local.runtime.holding.map ({uuid, functionName}) ->
+
+                    {object, functions} = local.entities[uuid]
+                    {expects, original} = functions[functionName]
+
                     return if beforeAlls.indexOf( expects[0].creator ) >= 0
-                    
-                    console.log 
-
-
-                        DO_UNSTUB: functionName
 
                     #
-                    # necessary? 
+                    # * replace the original function
                     #
+
+                    if original.fn? then object[functionName] = original.fn
+                    else delete object[functionName]
+
+                    #
+                    # * delete the expectation record
+                    #
+
+                    delete functions[functionName]
 
 
             else if (try runtime.spec.type is 'hook')
@@ -560,15 +568,15 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                         #
                         # * place stubs into holding - because the beforeAll that created them
                         #   might not **still be** an ancestor of the next test, at which point
-                        #   the stub need to be removed (unknown at this time)
+                        #   the stub needs to be removed (unknown at this time)
                         #
 
                         holding.push
 
-                            expects: expects   
+                            # expects: expects
                             functionName: functionName
-                            object: object
-
+                            uuid: uuid
+                            # object: object
 
                         continue
 

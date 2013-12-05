@@ -950,6 +950,43 @@ describe 'does', ->
 
                 .then (->), done
 
+
+            it.only "creates a holding record for expectations created by ancestor beforeAll hooks", (done) -> 
+
+
+                #
+                # expectations are reset at the end of each test, but expectations created in beforeAll hooks 
+                # need to remain in place and are only eligable for reset if the next test no longer has the
+                # creator beforeAll hook as an ancestor
+                # 
+                # the holding records contains expectations that "might" need to be reset, it only becomes
+                # known when the next tet starts and it's ancestry becomes available
+                #
+
+                thing = new class Thing
+                    fnOriginal: -> ### original ###
+
+                instance = does()
+
+                instance.spectate( name: 'Thing', thing ).then (thing) =>
+
+                    instance.activate @beforeEachHookActivation
+                    thing.does 
+                        fnFromBeforeEach: ->
+                        fnOriginal: -> 
+
+                    instance.activate @beforeAllHookActivation
+                    thing.does fnFromBeforeAll: ->
+
+                    instance.reset().then ->
+
+                        holding = does._test().runtime.holding
+                        holding.should.eql [
+                            { functionName: 'fnFromBeforeAll', uuid: '1' }
+                        ]
+
+                        done()
+
             
 
 
