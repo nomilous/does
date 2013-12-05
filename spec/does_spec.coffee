@@ -951,7 +951,7 @@ describe 'does', ->
                 .then (->), done
 
 
-            it.only "creates a holding record for expectations created by ancestor beforeAll hooks", (done) -> 
+            it "clears the previous holding records and creates a holding record for expectations created by ancestor beforeAll hooks", (done) -> 
 
 
                 #
@@ -969,6 +969,12 @@ describe 'does', ->
                 instance = does()
 
                 instance.spectate( name: 'Thing', thing ).then (thing) =>
+
+                    runtime = does._test().runtime
+                    runtime.holding.push 
+
+                        functionName: 'previosFunction'
+                        uuid: '1'
 
                     instance.activate @beforeEachHookActivation
                     thing.does 
