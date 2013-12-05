@@ -293,6 +293,85 @@ describe 'does', ->
             done()
 
 
+        it """removes expectations in holding if the creator is no longer an ancestor 
+                and leaves expectations inplace where the creator is still an ancestor""", (done) -> 
+
+
+            ancestorHook = ->
+            nonAncestorHook = ->
+
+            spec = 
+                type: 'test'
+                timer: _onTimeout: ->
+                parent: 
+                    title: ''
+                    _beforeAll: [ancestorHook]
+
+            instance = does()
+
+            {runtime, entities} = does._test()
+
+            #
+            # holding records set up at reset after previous test
+            # for function expectations created by beforeAll hooks 
+            # that may or may not require a reset depending if the
+            # next test still has that beforeAll hook as an ancestor
+            #
+
+            runtime.holding.push
+                functionName: 'createdByNonAncestor'
+                uuid: 'UUID'
+
+            runtime.holding.push
+                functionName: 'createdByAncestor'
+                uuid: 'UUID'
+
+            #
+            # create testtarget and expectation record as if testTargetObject.does was called
+            #
+
+            testTargetObject = 
+                createdByNonAncestor: -> ### this stub gets restored ###
+                createdByAncestor: -> ### should remain a stubbed function ### 
+
+
+            entities['UUID'] = 
+
+                object: testTargetObject
+                functions:
+
+                    createdByNonAncestor: 
+                        expects: [
+                            creator: nonAncestorHook
+                        ]
+                        original: 
+                            fn: -> ### ORIGINAL function createdByNonAncestor ###
+
+                    createdByAncestor: 
+                        expects: [
+                            creator: ancestorHook
+                        ]
+                        original: 
+                            fn: -> ### ORIGINAL function createdByAncestor ###
+
+
+            #
+            # activate runs ahead of the next test and should remove 
+            # all NON-ancestrally created stubs listed in holding
+            #
+
+            testTargetObject.createdByNonAncestor.toString().should.match /this stub gets restored/
+            testTargetObject.createdByAncestor.toString().should.match /should remain a stubbed function/
+
+            instance.activate mode: 'spec', spec: spec, context: 'CONTEXT', resolver: ->
+
+            testTargetObject.createdByNonAncestor.toString().should.match /ORIGINAL function createdByNonAncestor/
+            testTargetObject.createdByAncestor.toString().should.match /should remain a stubbed function/
+            done()
+
+
+
+
     context 'expectation records contains', -> 
 
         before (done) -> 
