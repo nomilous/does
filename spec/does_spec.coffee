@@ -77,7 +77,7 @@ describe 'does', ->
         done()
 
 
-    it 'defines spectate() to spectateability to an entity', (done) -> 
+    it 'defines spectate() to imbue an entity with spectateability', (done) -> 
 
         does().spectate.should.be.an.instanceof Function
         done()
