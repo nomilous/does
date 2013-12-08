@@ -961,6 +961,11 @@ describe 'does', ->
                 thing.does fn: -> {test: 1}.should.eql {test:2}
                 thing.fn()
 
+                #
+                # did not immediately throw the AssertionError
+                # it is kept for final display
+                #
+
                 instance.assert( -> ).then(
 
                     ->
@@ -985,7 +990,29 @@ describe 'does', ->
 
                 )
 
+        it 'throws non AssertionErrors immediately',
 
+            #
+            # sometimes a stubbed function may assert args
+            # and then return a mock, problems with the 
+            # mock definition can lead to TypeDef errors
+            # that need to be thrown immediately
+            #
+
+            ipso (done) -> 
+
+                thing = new class Thing
+                instance = does()
+                instance.spectate( name: 'Thing', thing ).then (thing) => 
+
+                    instance.activate @testActivation
+                    thing.does fn: -> throw new Error 'moo'
+
+                    try thing.fn()
+                    catch error
+
+                        error.should.match /moo/
+                        done()
 
 
         it 'calls reset() to clear stubs and expectation ahead of next test setup', (done) -> 

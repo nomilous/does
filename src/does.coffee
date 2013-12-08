@@ -654,8 +654,17 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                         expect.fn.apply @, arguments
                         original.fn.apply @, arguments if original.fn?
                     catch error
-                        expect.error = error
-                        #throw error
+
+                        #
+                        # could be expanded to use error array
+                        # to see all assertionerrors in one go
+                        # instead of just the first one
+                        #
+
+                        if error.name is 'AssertionError'
+                            expect.error = error
+                        else 
+                            throw error
                     
 
                 else object[fnName] = stub = -> 
@@ -668,8 +677,10 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                     try 
                         expect.fn.apply @, arguments
                     catch error
-                        expect.error = error
-                        #throw error
+                        if error.name is 'AssertionError'
+                            expect.error = error
+                        else 
+                            throw error
 
             else
 
@@ -684,8 +695,10 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                         expect.fn.apply @, arguments
                         original.fn.apply @, arguments if original.fn?
                     catch error
-                        expect.error = error
-                        #throw error
+                        if error.name is 'AssertionError'
+                            expect.error = error
+                        else 
+                            throw error
 
                     
 
@@ -699,8 +712,10 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                     try
                         expect.fn.apply @, arguments
                     catch error
-                        expect.error = error
-                        #throw error
+                        if error.name is 'AssertionError'
+                            expect.error = error
+                        else 
+                            throw error
 
 
             expects[0] = expect = 
@@ -787,6 +802,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
             #
 
             spec = local.runtime.current.spec
+
             return action.resolve() unless spec.type is 'test'
 
             if typeof done is 'function'
@@ -834,7 +850,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                                         'expected/actual': expect.error.expected
                                 continue
 
-                            else 
+                            else
 
                                 local.reset().then -> 
 
