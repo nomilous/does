@@ -115,6 +115,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
         getSync: (opts) -> 
 
             try name = opts.query.tag ##undecided
+            name ||= opts
 
             throw new Error(
                 "does.get(opts) requires opts.query.tag"

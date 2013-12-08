@@ -425,6 +425,29 @@ describe 'does', ->
             @record.spectator.should.equal 'does'
 
 
+    context 'getSync()', -> 
+
+        it 'returns spectated object', 
+
+            ipso (facto) -> 
+
+                def = new class Thing
+
+                instance = does()
+                instance.spectate
+
+                    name: 'Thing'
+                    tagged: true
+                    def
+
+                .then (thing) -> 
+
+                    instance.getSync('Thing').object.should.eql def
+                    facto()
+
+
+
+
     it 'creates object.does fuction', ipso (done) -> 
 
         does().spectate( 'Thing', new class Thing ).then (thing) -> 
