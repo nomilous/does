@@ -150,7 +150,7 @@ describe 'does', ->
             )
 
 
-    it 'defines spectateSync() to spectateability to an entity', (done) -> 
+    it 'defines spectateSync() to synchronously imbue spectateability', (done) -> 
 
         does().spectateSync.should.be.an.instanceof Function
         done()
