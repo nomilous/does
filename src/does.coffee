@@ -310,12 +310,36 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
             name = opts.name
 
-            return action.reject new Error( 
-                "does can't reassign tag #{name}"
-            ) if opts.tagged and local.tagged[name]?
+            # return action.reject new Error( 
+            #     "does can't reassign tag #{name}"
+            # ) if opts.tagged and local.tagged[name]?
                                 #
                                 # ##undecided - tagged keyed on name vs uuid
                                 # 
+
+            if opts.tagged and local.tagged[name]?
+
+                try 
+                    object        = local.tagged[name].object.object
+                    originalTitle = object.title
+                    newTitle      = name
+
+                    if originalTitle == newTitle
+
+                        #
+                        # * ignore call to spactate an already spectated object,
+                        #   this happens when define(list) created mocks internally
+                        #   and the mocks are injected into tests later.
+                        #
+                        # * potential future bugs here, resolving with the existing
+                        #   object and not the new one, suspected ok because attempts 
+                        #   to create a tag or mock with an existing name on a different
+                        #   object returning the first seems acceptable.
+                        #   
+
+                        return action.resolve object
+                
+                return action.reject Error "does can't reassign tag #{name}"
 
             spectatorName = 
                 if object.does? and not object.does.uuid? then '$does'
@@ -413,9 +437,23 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
             name = opts.name
 
-            throw new Error( 
-                "does can't reassign tag #{name}"
-            ) if opts.tagged and local.tagged[name]?
+            # throw new Error( 
+            #     "does can't reassign tag #{name}"
+            # ) if opts.tagged and local.tagged[name]?
+
+
+            if opts.tagged and local.tagged[name]?
+
+                try 
+                    object        = local.tagged[name].object.object
+                    originalTitle = object.title
+                    newTitle      = name
+
+                    return object if originalTitle == newTitle
+                
+                throw new Error "does can't reassign tag #{name}"
+
+
 
             spectatorName = 
                 if object.does? and not object.does.uuid? then '$does'
