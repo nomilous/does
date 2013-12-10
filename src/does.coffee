@@ -651,6 +651,15 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
         expectFn: ({creator, uuid, fnName, fn, spy}) -> 
 
+
+            #
+            # * special case expectation on constructor is renamed 
+            #   to $constructor (used by ipso.Mock, ?TEMPORARY?)
+            #  
+
+            if fnName is 'constructor' then fnName = '$constructor'
+
+
             #
             # keep original functions and replace on entity
             #
@@ -868,7 +877,18 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
                         {expects, original} = functions[fnName]
                         expect = expects[0]
-                        call = "#{type}.#{fnName}()"
+
+                        #
+                        # * special case expectation on constructor was renamed
+                        #   to $constructor (used by ipso.Mock, ?TEMPORARY?)
+                        #   
+                        # * use original name for assertion output
+                        # 
+
+                        if fnName is '$constructor' then call = "#{type}.constructor()"
+                        else call = "#{type}.#{fnName}()"
+
+
 
                         unless expect.expectation
                             expected[name].functions[call] = 'passive stub'
