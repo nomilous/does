@@ -183,13 +183,11 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
         activate: (runtime) -> 
 
-            console.log activate: 1
-
             local.runtime.current = runtime
             rname = local.runtime.name ||= detect(rootContext)
             return unless rname is 'mocha'
 
-            
+
             if runtime.spec?
 
                 #
