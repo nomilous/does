@@ -939,6 +939,14 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
     else throw new Error "does doesn't #{mode}" 
 
+    #
+    # exported functions
+    # ------------------
+    # 
+    # * for testability, the entire last created instance is expeoted at _test()
+    #   see below
+    #
+
     routes = 
 
         spectate:     local.spectate
@@ -951,9 +959,21 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
         getSync:      local.getSync
         activate:     local.activate
 
+    #
+    # web exported functions
+    # ----------------------
+    # 
+    # * functions callable over web api
+    # * these only become available if this does instance is grafted onto a 
+    #   running [vertex](https://github.com/nomilous/vertex) routes tree
+    #
+    #             (much work still to be done there)
+    #
 
-    routes.get.$api = {}    # vertex api
+    routes.get.$www = {}
+
     return routes
+
 
 
 detect = (context) -> 
