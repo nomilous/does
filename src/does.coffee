@@ -93,6 +93,17 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
         ###
 
+
+        #
+        # `get(opts, callback)` - Get spectated objects by tag name
+        # ---------------------------------------------------------
+        # 
+        # * opts.query.tag specifies the name
+        # * vertex exported (see "web exported functions" below)
+        #  
+        #        /**/*/get?tag=name
+        #
+
         get: (opts, callback) -> 
 
             #
@@ -111,6 +122,10 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
             callback null, local.tagged[name].object
 
+        #
+        # `getSync(opts)` - See above
+        # ---------------------------
+        #
 
         getSync: (opts) -> 
 
@@ -126,6 +141,21 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
             ) unless local.tagged[name]?
 
             return local.tagged[name].object
+
+
+        #
+        # `mode(modeName)` - Set the mode
+        # -------------------------------
+        # 
+        # 'spec'   - the default, enables mocha integrations including 
+        #            function stubbing and call assertions
+        # 
+        # 'bridge' - disables spec functionalities 
+        #
+
+        mode: (modeName) -> 
+
+            mode = modeName
 
 
         #
@@ -153,9 +183,13 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
         activate: (runtime) -> 
 
+            console.log activate: 1
+
             local.runtime.current = runtime
             rname = local.runtime.name ||= detect(rootContext)
             return unless rname is 'mocha'
+
+            
             if runtime.spec?
 
                 #
@@ -949,6 +983,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
     routes = 
 
+        mode:         local.mode
         spectate:     local.spectate
         spectateSync: local.spectateSync
         # subscribe:  local.subscribe
@@ -981,6 +1016,9 @@ detect = (context) ->
     return 'mocha' if ( 
         context.xit? and context.xdescribe? and context.xcontext?
     )
+
+    return 'bridge'
+
 
 getUuid = (object) -> 
 
