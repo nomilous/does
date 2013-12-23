@@ -932,14 +932,14 @@ describe 'does', ->
 
         it 'calls the original function from within the stub', ipso (done) -> 
 
-             thing = fn: (arg) -> return "ORIGINAL with #{arg}"
+             thing = fn: (arg1, arg2) -> return "ORIGINAL with #{arg1} and #{arg2}"
              instance = does()
              instance.spectate( name: 'thing', thing ).then (thing) => 
 
                 instance.activate @beforeEachHookActivation
 
                 thing.does fn: -> instance.original arguments
-                thing.fn('arg1').should.equal 'ORIGINAL with arg1'
+                thing.fn('arg1', 2).should.equal 'ORIGINAL with arg1 and 2'
                 done()
 
 
