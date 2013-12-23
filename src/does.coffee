@@ -1003,9 +1003,19 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
         # -----------------------------------------------------------------
         # 
 
-        original: (args) ->
+        original: (args = []) ->
 
             {context, fn} = local.originalFn
+            unless fn?
+                console.log 'does:', 'warning: called original() from outside stub'.yellow
+                return
+
+                #
+                # * the running stub proxy does not remove the original ref afterwards
+                # * if it did then problems would arrise with stubs calling stubs
+                # * a stack would be necessary, avoiding for now, experience it a bit first
+                # 
+
             fn.apply context, args
 
 
