@@ -922,6 +922,28 @@ describe 'does', ->
     #     it 'unstubs prototype expectations'
 
 
+    it 'defines original() to access the original function from within a stub', ipso -> 
+
+        instance = does()
+        instance.original.should.be.an.instanceof Function
+
+
+    context 'original()', -> 
+
+        it 'calls the original function from within the stub', ipso (done) -> 
+
+             thing = fn: (arg) -> return "ORIGINAL with #{arg}"
+             instance = does()
+             instance.spectate( name: 'thing', thing ).then (thing) => 
+
+                instance.activate @beforeEachHookActivation
+
+                thing.does fn: -> instance.original arguments
+                thing.fn('arg1').should.equal 'ORIGINAL with arg1'
+                done()
+
+
+
     it 'defines assert() to assert all active expectations', (done) -> 
 
         does().assert.should.be.an.instanceof Function
@@ -1033,7 +1055,7 @@ describe 'does', ->
             it 'removes expectations (created in beforeEach) and leaves stubs (created in beforeAll hooks)', (done) -> 
 
                 thing = new class Thing
-                    fnOriginal: -> ### original ###
+                    fnOriginal: -> ### ORIGINAL ###
 
                 instance = does()
 
@@ -1049,14 +1071,14 @@ describe 'does', ->
 
                     should.exist thing.fnFromBeforeEach
                     should.exist thing.fnOriginal
-                    thing.fnOriginal.toString().should.not.match /original/
+                    thing.fnOriginal.toString().should.not.match /ORIGINAL/
                     should.exist thing.fnFromBeforeAll
 
                     instance.reset().then ->
 
                         should.exist thing.fnFromBeforeAll
                         should.exist thing.fnOriginal
-                        thing.fnOriginal.toString().should.match /original/
+                        thing.fnOriginal.toString().should.match /ORIGINAL/
 
                         #
                         # expectation listing was kept, but set inactive, for ipso.$save()

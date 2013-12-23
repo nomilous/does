@@ -93,6 +93,24 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
         ###
 
+        originalFn: 
+            context: undefined
+            fn: undefined
+
+        ###
+
+`local.originalFn` - !!EXPERIMENTAL!!
+-------------------------------------
+
+* reference to the original function for access within a running stub
+* assigned by each stub proxy at calltime
+* accessable via does.original()
+* only behaves correctly when called from within the stub
+* use from within a spy stub will cause a duplicate call 
+
+
+        ###
+
 
         #
         # `get(opts, callback)` - Get spectated objects by tag name
@@ -727,6 +745,9 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                     ### EXPECTATION (spy) ###
                     ### These are created only in tests or beforeEach hooks ###
 
+                    local.originalFn.context = @
+                    local.originalFn.fn = original.fn
+
                     expect.called = true
                     expect.count++
                     try
@@ -751,6 +772,9 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                     ### EXPECTATION (mocker) ###
                     ### These are created only in tests or beforeEach hooks ###
 
+                    local.originalFn.context = @
+                    local.originalFn.fn = original.fn
+
                     expect.called = true
                     expect.count++
                     try 
@@ -767,6 +791,9 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
                     ### STUB (spy) ###
                     ### These are not created in tests or beforeEach hooks ###
+
+                    local.originalFn.context = @
+                    local.originalFn.fn = original.fn
 
                     expect.called = true
                     expect.count++
@@ -785,6 +812,9 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
                     ### STUB (mocker) ###
                     ### These are not created in tests or beforeEach hooks ###
+
+                    local.originalFn.context = @
+                    local.originalFn.fn = original.fn
 
                     expect.called = true
                     expect.count++
@@ -968,6 +998,18 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
             local.reset().then -> action.resolve()
 
 
+        #
+        # `original()` - Access to the original function from within a stub
+        # -----------------------------------------------------------------
+        # 
+
+        original: (args) ->
+
+            {context, fn} = local.originalFn
+            fn.apply context, args
+
+
+
 
     else throw new Error "does doesn't #{mode}" 
 
@@ -991,6 +1033,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
         get:          local.get
         getSync:      local.getSync
         activate:     local.activate
+        original:     local.original
 
     #
     # web exported functions
