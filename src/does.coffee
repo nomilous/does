@@ -26,6 +26,8 @@ module.exports  = (config = {}) ->
         # 
         #
 
+        mode: mode
+
         entities: {} # ∞
 
         ###
@@ -162,18 +164,17 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
 
         #
-        # `mode(modeName)` - Set the mode
-        # -------------------------------
+        # `config(opts)` 
+        # ------------- 
         # 
-        # 'spec'   - the default, enables mocha integrations including 
-        #            function stubbing and call assertions
-        # 
-        # 'bridge' - disables spec functionalities 
-        #
 
-        mode: (modeName) -> 
+        config: (opts) -> 
 
-            mode = modeName
+            for key of opts
+
+                switch key
+
+                    when 'mode' then local.mode = opts[key]
 
 
         #
@@ -200,6 +201,8 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
             holding: []
 
         activate: (runtime) -> 
+
+            return if runtime.mode is 'bridge'
 
             local.runtime.current = runtime
             rname = local.runtime.name ||= detect(rootContext)
@@ -353,6 +356,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
         spectate: deferred (action, opts, object) -> 
 
+            return action.resolve object if local.mode is 'bridge'
 
             return action.reject new Error( 
                 "does can't expect undefined to do stuff"
@@ -476,6 +480,8 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
         #
 
         spectateSync: (opts, object) ->
+
+            return object if local.mode is 'bridge'
 
             #
             # TODO: duplicated from above, tidy
@@ -901,6 +907,8 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
         assert: deferred (action, done = null) -> 
 
+            return if local.mode is 'bridge'
+
                                     #
                                     # TODO: dont need this done here any more
                                     #       got it in the runtime
@@ -1033,6 +1041,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
     routes = 
 
+        config:       local.config
         mode:         local.mode
         spectate:     local.spectate
         spectateSync: local.spectateSync
