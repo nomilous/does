@@ -906,13 +906,12 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
         #
 
         assert: deferred (action, done = null) -> 
-
-            return if local.mode is 'bridge'
-
                                     #
                                     # TODO: dont need this done here any more
                                     #       got it in the runtime
                                     #
+
+            return action.resolve() if local.mode is 'bridge'
 
             #
             # only process assert if test (not in hooks)
