@@ -40,7 +40,9 @@ Object.defineProperty Object.prototype, 'does',
 
                     fn = functions[fnName].expected.shift()
                     return fn() if typeof fn is 'function'
-                    throw new Error "Unexpected call to #{entities[this.$$id].object}.#{fnName}()" 
+                    throw new Error "Unexpected call to #{entities[this.$$id].object}.#{fnName}()"
+
+        return this
 
 
 Object.defineProperty Object.prototype, 'did', 
@@ -64,6 +66,8 @@ Object.defineProperty Object.prototype, 'did',
         if error.length > 0 
 
             throw new Error error
+
+        return this
 
 
 module.exports.entities = entities

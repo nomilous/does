@@ -50,3 +50,12 @@ describe 'start()', ->
         facto()
 
 ```
+
+### use standalone
+
+extends object.prototype with `does()` and `did()` for expectation setup and confirmation
+
+```
+
+
+```
