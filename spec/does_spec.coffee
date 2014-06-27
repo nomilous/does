@@ -11,6 +11,10 @@ describe 'does', ->
             error.message.should.equal "does doesn't discombobulate"
             done()
 
+    it 'exports mocha specific expectation functionality', ->
+
+        # should.exist does.mocha
+
     # 
     # no need  
     #

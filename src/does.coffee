@@ -989,6 +989,12 @@ Object.defineProperty module.exports, '_test',
         """
         fn
 
+#
+# lazy load does not require mocha unless called
+#
 
+Object.defineProperty module.exports, 'mocha',
+    enumarable: true
+    get: -> require './mocha'
 
 
