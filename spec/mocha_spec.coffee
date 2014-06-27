@@ -52,6 +52,33 @@ describe 'mocha', ->
         mocha.entities[test.$$id].functions.something.orig().should.equal 1
 
 
+    it 'only stores the original function on the first call to does()', ->
+
+        test = something: -> 1
+        test.does something: -> 2
+        test.does something: -> 3
+        mocha.entities[test.$$id].functions.something.orig().should.equal 1
+
+
+    it 'stores the sequence of expectation functions and calls each in turn', ->
+
+        test = {}
+        test.does something: -> 1
+        test.does something: -> 2
+        test.something().should.equal 1
+        test.something().should.equal 2
+
+
+    it 'throws assertion error on unexpected call to function', (done) ->
+
+        test = {}
+        test.does something: -> 1
+        test.something().should.equal 1
+        try test.something()
+        catch error
+            error.should.match /Unexpected call to \[object Object\].something\(\)/
+            done()
+
 
 
     context 'as Object', -> 

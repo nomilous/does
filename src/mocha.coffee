@@ -1,10 +1,11 @@
+
 id_seq = 0
 
 entities = {}
 
 Object.defineProperty Object.prototype, 'does', 
 
-    enumerable: true
+    enumerable: false
 
     get: -> (opts) ->
 
@@ -22,14 +23,26 @@ Object.defineProperty Object.prototype, 'does',
 
             continue if fnName is 'does'
 
-            origFn = this[fnName]
+            do (fnName) =>
 
-            this[fnName] = opts[fnName]
+                origFn = this[fnName]
 
-            functions = entities[this.$$id].functions ||= {}
+                functions = entities[this.$$id].functions ||= {}
 
-            functions[fnName] = orig: origFn
+                unless functions[fnName]?
 
+                    functions[fnName] = orig: origFn
+
+
+                functions[fnName].expected ||= []
+                functions[fnName].expected.push opts[fnName]
+
+
+                this[fnName] = ->
+
+                    fn = functions[fnName].expected.shift()
+                    return fn() if typeof fn is 'function'
+                    throw new Error "Unexpected call to #{entities[this.$$id].object}.#{fnName}()" 
 
         
 
