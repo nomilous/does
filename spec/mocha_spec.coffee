@@ -27,6 +27,7 @@ describe 'mocha', ->
         test.does something: ->
         test.$$id.should.exist
 
+
     it 'leaves the id inplace on second call to does()', ->
 
         test = {}
@@ -34,6 +35,23 @@ describe 'mocha', ->
         id = test.$$id
         test.does something2: ->
         test.$$id.should.equal id
+
+
+    it 'creates an entity record for the object', ->
+
+        test = {}
+        test.does something: ->
+        should.exist mocha.entities[test.$$id]
+
+
+    it 'creates a functions subrecord on the entity to store the original function', ->
+
+        test = something: -> 1
+        test.does something: -> 2
+        should.exist mocha.entities[test.$$id].functions.something.orig
+        mocha.entities[test.$$id].functions.something.orig().should.equal 1
+
+
 
 
     context 'as Object', -> 
