@@ -1,7 +1,7 @@
 should = require 'should'
-mocha = require '../lib/mocha'
+object = require '../lib/object'
 
-describe 'mocha', ->
+describe 'object', ->
 
 
     it 'defined does() on object', ->
@@ -48,15 +48,15 @@ describe 'mocha', ->
 
         test = {}
         test.does something: ->
-        should.exist mocha.entities[test.$$id]
+        should.exist object.entities[test.$$id]
 
 
     it 'creates a functions subrecord on the entity to store the original function', ->
 
         test = something: -> 1
         test.does something: -> 2
-        should.exist mocha.entities[test.$$id].functions.something.orig
-        mocha.entities[test.$$id].functions.something.orig().should.equal 1
+        should.exist object.entities[test.$$id].functions.something.orig
+        object.entities[test.$$id].functions.something.orig().should.equal 1
 
 
     it 'only stores the original function on the first call to does()', ->
@@ -64,7 +64,7 @@ describe 'mocha', ->
         test = something: -> 1
         test.does something: -> 2
         test.does something: -> 3
-        mocha.entities[test.$$id].functions.something.orig().should.equal 1
+        object.entities[test.$$id].functions.something.orig().should.equal 1
 
 
     it 'stores the sequence of expectation functions and calls each in turn', ->
@@ -103,5 +103,6 @@ describe 'mocha', ->
         test.something().should.equal 2
         test.did
         test.something().should.equal 1
+
 
 

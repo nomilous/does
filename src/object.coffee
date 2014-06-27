@@ -33,10 +33,8 @@ Object.defineProperty Object.prototype, 'does',
 
                     functions[fnName] = orig: origFn
 
-
                 functions[fnName].expected ||= []
                 functions[fnName].expected.push opts[fnName]
-
 
                 this[fnName] = ->
 
