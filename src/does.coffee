@@ -26,6 +26,8 @@ module.exports  = (config = {}) ->
         # 
         #
 
+        mode: mode
+
         entities: {} # ∞
 
         ###
@@ -93,6 +95,35 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
         ###
 
+        originalFn: 
+            context: undefined
+            fn: undefined
+
+        ###
+
+`local.originalFn` - !!EXPERIMENTAL!!
+-------------------------------------
+
+* reference to the original function for access within a running stub
+* assigned by each stub proxy at calltime
+* accessable via does.original()
+* only behaves correctly when called from within the stub
+* use from within a spy stub will cause a duplicate call 
+
+
+        ###
+
+
+        #
+        # `get(opts, callback)` - Get spectated objects by tag name
+        # ---------------------------------------------------------
+        # 
+        # * opts.query.tag specifies the name
+        # * vertex exported (see "web exported functions" below)
+        #  
+        #        /**/*/get?tag=name
+        #
+
         get: (opts, callback) -> 
 
             #
@@ -111,6 +142,10 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
             callback null, local.tagged[name].object
 
+        #
+        # `getSync(opts)` - See above
+        # ---------------------------
+        #
 
         getSync: (opts) -> 
 
@@ -126,6 +161,20 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
             ) unless local.tagged[name]?
 
             return local.tagged[name].object
+
+
+        #
+        # `config(opts)` 
+        # ------------- 
+        # 
+
+        config: (opts) -> 
+
+            for key of opts
+
+                switch key
+
+                    when 'mode' then local.mode = opts[key]
 
 
         #
@@ -153,9 +202,13 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
         activate: (runtime) -> 
 
+            return if runtime.mode is 'bridge'
+
             local.runtime.current = runtime
             rname = local.runtime.name ||= detect(rootContext)
             return unless rname is 'mocha'
+
+
             if runtime.spec?
 
                 #
@@ -303,6 +356,7 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
         spectate: deferred (action, opts, object) -> 
 
+            return action.resolve object if local.mode is 'bridge'
 
             return action.reject new Error( 
                 "does can't expect undefined to do stuff"
@@ -426,6 +480,8 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
         #
 
         spectateSync: (opts, object) ->
+
+            return object if local.mode is 'bridge'
 
             #
             # TODO: duplicated from above, tidy
@@ -695,6 +751,9 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                     ### EXPECTATION (spy) ###
                     ### These are created only in tests or beforeEach hooks ###
 
+                    local.originalFn.context = @
+                    local.originalFn.fn = original.fn
+
                     expect.called = true
                     expect.count++
                     try
@@ -719,6 +778,9 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
                     ### EXPECTATION (mocker) ###
                     ### These are created only in tests or beforeEach hooks ###
 
+                    local.originalFn.context = @
+                    local.originalFn.fn = original.fn
+
                     expect.called = true
                     expect.count++
                     try 
@@ -735,6 +797,9 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
                     ### STUB (spy) ###
                     ### These are not created in tests or beforeEach hooks ###
+
+                    local.originalFn.context = @
+                    local.originalFn.fn = original.fn
 
                     expect.called = true
                     expect.count++
@@ -753,6 +818,9 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
 
                     ### STUB (mocker) ###
                     ### These are not created in tests or beforeEach hooks ###
+
+                    local.originalFn.context = @
+                    local.originalFn.fn = original.fn
 
                     expect.called = true
                     expect.count++
@@ -838,11 +906,12 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
         #
 
         assert: deferred (action, done = null) -> 
-
                                     #
                                     # TODO: dont need this done here any more
                                     #       got it in the runtime
                                     #
+
+            return action.resolve() if local.mode is 'bridge'
 
             #
             # only process assert if test (not in hooks)
@@ -936,11 +1005,43 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
             local.reset().then -> action.resolve()
 
 
+        #
+        # `original()` - Access to the original function from within a stub
+        # -----------------------------------------------------------------
+        # 
+
+        original: (args = []) ->
+
+            {context, fn} = local.originalFn
+            unless fn?
+                console.log 'does:', 'warning: called original() from outside stub'.yellow
+                return
+
+                #
+                # * the running stub proxy does not remove the original ref afterwards
+                # * if it did then problems would arrise with stubs calling stubs
+                # * a stack would be necessary, avoiding for now, experience it a bit first
+                # 
+
+            fn.apply context, args
+
+
+
 
     else throw new Error "does doesn't #{mode}" 
 
+    #
+    # exported functions
+    # ------------------
+    # 
+    # * for testability, the entire last created instance is expeoted at _test()
+    #   see below
+    #
+
     routes = 
 
+        config:       local.config
+        mode:         local.mode
         spectate:     local.spectate
         spectateSync: local.spectateSync
         # subscribe:  local.subscribe
@@ -950,10 +1051,23 @@ tagged/:tag:/object -> entities/:uuid: (where tagged is true)
         get:          local.get
         getSync:      local.getSync
         activate:     local.activate
+        original:     local.original
 
+    #
+    # web exported functions
+    # ----------------------
+    # 
+    # * functions callable over web api
+    # * these only become available if this does instance is grafted onto a 
+    #   running [vertex](https://github.com/nomilous/vertex) routes tree
+    #
+    #             (much work still to be done there)
+    #
 
-    routes.get.$api = {}    # vertex api
+    routes.get.$www = {}
+
     return routes
+
 
 
 detect = (context) -> 
@@ -961,6 +1075,9 @@ detect = (context) ->
     return 'mocha' if ( 
         context.xit? and context.xdescribe? and context.xcontext?
     )
+
+    return 'bridge'
+
 
 getUuid = (object) -> 
 

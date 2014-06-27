@@ -926,6 +926,36 @@ describe 'does', ->
     #     it 'unstubs prototype expectations'
 
 
+    it 'defines original() to access the original function from within a stub', ipso -> 
+
+        instance = does()
+        instance.original.should.be.an.instanceof Function
+
+
+    context 'original()', -> 
+
+        it 'calls the original function from within the stub', ipso (done) -> 
+
+            thing = 
+                fn1: (arg1, arg2) -> return "ORIGINAL1 with #{arg1} and #{arg2}"
+                fn2: (arg1, arg2) -> return "ORIGINAL2 with #{arg1} and #{arg2}"
+
+            instance = does()
+            #instance.original()
+            instance.spectate( name: 'thing', thing ).then (thing) => 
+
+                instance.activate @beforeEachHookActivation
+                thing.does 
+                    fn1: -> instance.original arguments
+                    fn2: -> instance.original arguments
+
+                thing.fn1('arg1', 2).should.equal 'ORIGINAL1 with arg1 and 2'
+                thing.fn2('arg1', 2).should.equal 'ORIGINAL2 with arg1 and 2'
+                thing.fn1('arg1', 2).should.equal 'ORIGINAL1 with arg1 and 2'
+                done()
+
+
+
     it 'defines assert() to assert all active expectations', (done) -> 
 
         does().assert.should.be.an.instanceof Function
@@ -1037,7 +1067,7 @@ describe 'does', ->
             it 'removes expectations (created in beforeEach) and leaves stubs (created in beforeAll hooks)', (done) -> 
 
                 thing = new class Thing
-                    fnOriginal: -> ### original ###
+                    fnOriginal: -> ### ORIGINAL ###
 
                 instance = does()
 
@@ -1053,14 +1083,14 @@ describe 'does', ->
 
                     should.exist thing.fnFromBeforeEach
                     should.exist thing.fnOriginal
-                    thing.fnOriginal.toString().should.not.match /original/
+                    thing.fnOriginal.toString().should.not.match /ORIGINAL/
                     should.exist thing.fnFromBeforeAll
 
                     instance.reset().then ->
 
                         should.exist thing.fnFromBeforeAll
                         should.exist thing.fnOriginal
-                        thing.fnOriginal.toString().should.match /original/
+                        thing.fnOriginal.toString().should.match /ORIGINAL/
 
                         #
                         # expectation listing was kept, but set inactive, for ipso.$save()
