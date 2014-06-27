@@ -44,7 +44,29 @@ Object.defineProperty Object.prototype, 'does',
                     return fn() if typeof fn is 'function'
                     throw new Error "Unexpected call to #{entities[this.$$id].object}.#{fnName}()" 
 
-        
+
+Object.defineProperty Object.prototype, 'did', 
+
+    enumerable: false
+
+    get: ->
+
+        error = ""
+
+        for fnName of entities[this.$$id].functions
+
+            if entities[this.$$id].functions[fnName].expected.length > 0
+
+                error ||= "Failed to call expected #{entities[this.$$id].object}.#{fnName}()"
+
+            entities[this.$$id].object[fnName] = entities[this.$$id].functions[fnName].orig
+
+        entities[this.$$id].functions = {}
+
+        if error.length > 0 
+
+            throw new Error error
+
 
 module.exports.entities = entities
 

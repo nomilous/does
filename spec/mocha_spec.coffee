@@ -21,6 +21,13 @@ describe 'mocha', ->
         (new Test).does.should.be.an.instanceof Function
 
 
+    it 'creates functions on object if not present', ->
+
+        test = {}
+        test.does function: -> 1
+        test.function().should.equal 1
+
+
     it 'creates a id on the object if does() is called', ->
 
         test = {}
@@ -80,12 +87,21 @@ describe 'mocha', ->
             done()
 
 
+    it 'throws on failure to call expected function', (done) ->
 
-    context 'as Object', -> 
+        test = {}
+        test.does something: -> 
+        try test.did
+        catch error 
+            error.should.match /Failed to call expected \[object Object\].something\(\)/
+            done()
 
-        it 'creates functions on object if not present', ->
+    it 'restores the original function', ->
 
-            test = {}
-            test.does function: -> 1
-            test.function().should.equal 1
+        test = something: -> 1
+        test.does something: -> 2
+        test.something().should.equal 2
+        test.did
+        test.something().should.equal 1
+
 
