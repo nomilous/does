@@ -2,6 +2,14 @@
 Object.defineProperty Object.prototype, 'does', 
 
     enumerable: true
-    get: -> ->
+    
+    get: -> (opts) ->
+
+        for fnName of opts
+
+            this[fnName] = opts[fnName]
+
+        
 
 module.exports = ->
+

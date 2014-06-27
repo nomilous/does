@@ -19,3 +19,12 @@ describe 'mocha', ->
 
         class Test
         (new Test).does.should.be.an.instanceof Function
+
+
+    context 'as Object', -> 
+
+        it 'creates functions on object', ->
+
+            test = {}
+            test.does function: -> 1
+            test.function().should.equal 1
