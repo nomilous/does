@@ -72,7 +72,7 @@ Object.defineProperty Object.prototype, 'did',
         return this
 
 
-module.exports = (fn) ->
+module.exports = wrap = (fn) ->
 
     (done) ->
         
@@ -90,7 +90,7 @@ module.exports = (fn) ->
         fn()
 
         for id of entities
-            
+
             object = entities[id].object
             object.did
 
