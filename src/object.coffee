@@ -3,6 +3,8 @@ id_seq = 0
 
 entities = {}
 
+{util} = require 'also'
+
 Object.defineProperty Object.prototype, 'does', 
 
     enumerable: false
@@ -68,6 +70,34 @@ Object.defineProperty Object.prototype, 'did',
             throw new Error error
 
         return this
+
+
+module.exports = (fn) ->
+
+    (done) ->
+        
+        if util.argsOf(fn)[0] == 'done'
+
+            return fn ->
+
+                for id of entities
+
+                    object = entities[id].object
+                    object.did
+
+                done()
+            
+        fn()
+
+        for id of entities
+            
+            object = entities[id].object
+            object.did
+
+        done()
+
+
+
 
 
 module.exports.entities = entities

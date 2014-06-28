@@ -1,5 +1,5 @@
 should = require 'should'
-object = require '../lib/object'
+wrap = require '../lib/object'
 
 describe 'object', ->
 
@@ -32,6 +32,7 @@ describe 'object', ->
 
         test = {}
         test.does something: ->
+        test.something()
         test.$$id.should.exist
 
 
@@ -39,24 +40,28 @@ describe 'object', ->
 
         test = {}
         test.does something1: ->
+        test.something1()
         id = test.$$id
         test.does something2: ->
         test.$$id.should.equal id
+        test.something2()
 
 
     it 'creates an entity record for the object', ->
 
         test = {}
         test.does something: ->
-        should.exist object.entities[test.$$id]
+        test.something()
+        should.exist wrap.entities[test.$$id]
 
 
     it 'creates a functions subrecord on the entity to store the original function', ->
 
         test = something: -> 1
         test.does something: -> 2
-        should.exist object.entities[test.$$id].functions.something.orig
-        object.entities[test.$$id].functions.something.orig().should.equal 1
+        should.exist wrap.entities[test.$$id].functions.something.orig
+        wrap.entities[test.$$id].functions.something.orig().should.equal 1
+        test.something()
 
 
     it 'only stores the original function on the first call to does()', ->
@@ -64,7 +69,9 @@ describe 'object', ->
         test = something: -> 1
         test.does something: -> 2
         test.does something: -> 3
-        object.entities[test.$$id].functions.something.orig().should.equal 1
+        wrap.entities[test.$$id].functions.something.orig().should.equal 1
+        test.something()
+        test.something()
 
 
     it 'stores the sequence of expectation functions and calls each in turn', ->
@@ -96,6 +103,7 @@ describe 'object', ->
             error.should.match /Failed to call expected \[object Object\].something\(\)/
             done()
 
+
     it 'restores the original function', ->
 
         test = something: -> 1
@@ -104,5 +112,16 @@ describe 'object', ->
         test.did
         test.something().should.equal 1
 
+
+    it 'wraps test functions', wrap ->
+
+
+    it 'wraps test functions with done', wrap (done) -> done()
+
+
+    xit 'automatically tests all expectations when wrapped', wrap ->
+
+        {}.does something1: ->
+        {}.does something1: ->
 
 
